@@ -43,33 +43,33 @@ export function Sidebar({ className }: SidebarProps) {
   };
 
   return (
-    <div className={cn("flex h-full w-64 flex-col border-r border-gray-200 bg-white shadow-sm", className)}>
+    <div className={cn("flex h-full w-64 flex-col border-r border-slate-700 bg-[image:var(--sidebar-gradient)] text-slate-200", className)}>
       {/* Logo/Brand */}
-      <div className="flex h-16 items-center border-b border-gray-100 px-6">
+      <div className="flex h-[4.5rem] items-center border-b border-white/10 px-5">
         <Link href="/dashboard" className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded-lg bg-button-gradient flex items-center justify-center shadow-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-button-gradient shadow-lg shadow-rose-950/30">
             <span className="text-white font-bold text-sm">TMP</span>
           </div>
-          <span className="font-semibold text-lg text-gray-900">Training Platform</span>
+          <div><span className="block text-sm font-semibold tracking-tight text-white">Jubilee</span><span className="block text-[10px] font-medium uppercase tracking-[.16em] text-slate-400">Learning hub</span></div>
         </Link>
       </div>
 
       {/* Navigation */}
       <ScrollArea className="flex-1 px-3 py-4">
-        <nav className="space-y-2">
+        <nav className="space-y-5">
           {navigation.map((group) => (
             <div key={group.title}>
               {/* Group Header */}
-              <div className="px-3 py-2">
+              <div className="px-3 py-1">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-gray-500 uppercase tracking-wide red-dot">
+                  <p className="text-[10px] font-semibold uppercase tracking-[.14em] text-slate-500">
                     {group.title}
                   </p>
                   {group.items.some(item => item.children) && (
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-4 w-4 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                      className="h-5 w-5 p-0 text-slate-500 hover:bg-white/10 hover:text-white"
                       onClick={() => toggleGroup(group.title)}
                     >
                       {isGroupExpanded(group.title) ? (
@@ -90,40 +90,40 @@ export function Sidebar({ className }: SidebarProps) {
                     <Link
                       href={item.href}
                       className={cn(
-                        "flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover-red-accent group",
+                        "group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                         isActiveLink(item.href)
-                          ? "bg-accent-gradient text-white shadow-md border-l-4 border-red-700"
-                          : "text-gray-700 hover:text-gray-900"
+                          ? "bg-white/12 text-white shadow-sm ring-1 ring-white/10"
+                          : "text-slate-300 hover:bg-white/6 hover:text-white"
                       )}
                     >
                       <item.icon className={cn(
                         "mr-3 h-4 w-4 transition-colors",
                         isActiveLink(item.href) 
                           ? "text-white" 
-                          : "text-gray-500 group-hover:text-red-600"
+                          : "text-slate-500 group-hover:text-rose-300"
                       )} />
                       {item.title}
                     </Link>
 
                     {/* Child Items */}
                     {item.children && isGroupExpanded(group.title) && (
-                      <div className="ml-7 space-y-1 border-l-2 border-gray-100 pl-3">
+                      <div className="ml-7 space-y-1 border-l border-white/10 pl-3">
                         {item.children.map((child) => (
                           <Link
                             key={child.href}
                             href={child.href}
                             className={cn(
-                              "flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-200 hover:bg-red-50 hover:text-red-700 group",
+                              "group flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-200 hover:bg-white/6 hover:text-white",
                               isActiveLink(child.href)
-                                ? "bg-red-100 text-red-700 font-medium"
-                                : "text-gray-600"
+                                ? "bg-white/10 text-white font-medium"
+                                : "text-slate-400"
                             )}
                           >
                             <child.icon className={cn(
                               "mr-3 h-3 w-3 transition-colors",
                               isActiveLink(child.href)
-                                ? "text-red-700"
-                                : "text-gray-400 group-hover:text-red-600"
+                                ? "text-rose-300"
+                                : "text-slate-600 group-hover:text-rose-300"
                             )} />
                             {child.title}
                           </Link>
@@ -139,18 +139,18 @@ export function Sidebar({ className }: SidebarProps) {
       </ScrollArea>
 
       {/* User Profile Section */}
-      <div className="border-t border-gray-200 p-4 bg-gradient-to-r from-red-50 to-white">
+      <div className="border-t border-white/10 p-4">
         <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 rounded-full bg-button-gradient flex items-center justify-center shadow-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-button-gradient shadow-md">
             <span className="text-white text-sm font-medium">
               {user.firstName.charAt(0)}{user.lastName.charAt(0)}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate text-gray-900">
+            <p className="truncate text-sm font-medium text-white">
               {user.firstName} {user.lastName}
             </p>
-            <p className="text-xs text-red-600 truncate font-medium">
+            <p className="truncate text-[11px] font-medium uppercase tracking-wide text-slate-400">
               {user.role.replace('_', ' ')}
             </p>
           </div>

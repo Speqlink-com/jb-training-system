@@ -75,24 +75,25 @@ function DashboardContent() {
   const stats = getRoleBasedStats();
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="mx-auto max-w-[1600px] space-y-6 p-5 sm:p-7">
       {/* Welcome Section */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white px-5 py-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
-          <h1 className="text-3xl font-bold">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-[.16em] text-[#9b1b36]">Overview</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
             Good morning, {user.firstName}
           </h1>
-          <p className="text-muted-foreground">
-            Here's what's happening with your training platform today
+          <p className="mt-1 text-sm text-muted-foreground">
+            Here’s your workforce learning and compliance snapshot for today.
           </p>
         </div>
-        <Badge variant="secondary" className="text-sm">
+        <Badge variant="secondary" className="w-fit rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide">
           {user.role.replace('_', ' ')}
         </Badge>
       </div>
 
       {/* Role-specific stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat, index) => (
           <StatCard
             key={index}
@@ -106,15 +107,15 @@ function DashboardContent() {
       </div>
 
       {/* Role-specific content */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <Card className="border-slate-200/90 bg-white shadow-sm">
+          <CardHeader className="border-b border-slate-100 pb-5">
+            <CardTitle className="text-base">Quick actions</CardTitle>
             <CardDescription>
               Common tasks for your role
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-2 pt-5">
             {hasRole(Role.AGENT) && (
               <>
                 <Button variant="outline" className="w-full justify-start">
@@ -177,17 +178,17 @@ function DashboardContent() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+        <Card className="border-slate-200/90 bg-white shadow-sm">
+          <CardHeader className="border-b border-slate-100 pb-5">
+            <CardTitle className="text-base">Recent activity</CardTitle>
             <CardDescription>
               Latest updates and notifications
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-5">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                <div className="h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">Training completed</p>
                   <p className="text-xs text-muted-foreground">AML Compliance Training</p>
@@ -196,7 +197,7 @@ function DashboardContent() {
               </div>
               
               <div className="flex items-center gap-3">
-                <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                <div className="h-2 w-2 rounded-full bg-blue-500 ring-4 ring-blue-50"></div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">New agent onboarded</p>
                   <p className="text-xs text-muted-foreground">John Kamau - AGT-001234</p>
@@ -205,7 +206,7 @@ function DashboardContent() {
               </div>
               
               <div className="flex items-center gap-3">
-                <div className="h-2 w-2 bg-yellow-500 rounded-full"></div>
+                <div className="h-2 w-2 rounded-full bg-amber-500 ring-4 ring-amber-50"></div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">Training reminder</p>
                   <p className="text-xs text-muted-foreground">Product Training scheduled for tomorrow</p>

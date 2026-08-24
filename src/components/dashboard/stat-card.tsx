@@ -23,24 +23,24 @@ export function StatCard({
   className 
 }: StatCardProps) {
   return (
-    <Card className={cn("relative bg-white border-gray-200 hover:border-red-200 transition-colors shadow-sm hover:shadow-md group overflow-hidden", className)}>
-      <CardContent className="p-6">
+    <Card className={cn("group relative overflow-hidden border-slate-200/90 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md", className)}>
+      <CardContent className="p-5">
         <div className="flex items-center justify-between space-y-0 pb-2">
-          <p className="text-sm font-medium text-gray-600 group-hover:text-red-600 transition-colors">
+          <p className="text-sm font-medium text-slate-500">
             {title}
           </p>
           {Icon && (
-            <div className="h-10 w-10 bg-red-50 rounded-lg flex items-center justify-center group-hover:bg-red-100 transition-colors">
-              <Icon className="h-5 w-5 text-red-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 transition-colors group-hover:bg-[#f6e8eb]">
+              <Icon className="h-5 w-5 text-slate-600 transition-colors group-hover:text-[#9b1b36]" />
             </div>
           )}
         </div>
         <div className="space-y-1">
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="text-2xl font-semibold tracking-tight text-slate-900">
             {typeof value === 'number' ? value.toLocaleString() : value}
           </p>
           {description && (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-500">
               {description}
             </p>
           )}
@@ -50,20 +50,19 @@ export function StatCard({
                 className={cn(
                   "font-medium px-2 py-1 rounded-full",
                   trend.isPositive 
-                    ? "text-green-700 bg-green-50 border border-green-200" 
-                    : "text-red-700 bg-red-50 border border-red-200"
+                    ? "border border-emerald-100 bg-emerald-50 text-emerald-700"
+                    : "border border-rose-100 bg-rose-50 text-rose-700"
                 )}
               >
                 {trend.isPositive ? "+" : ""}{trend.value}%
               </span>
-              <span className="text-gray-500">
+              <span className="text-slate-400">
                 from last month
               </span>
             </div>
           )}
         </div>
-        {/* Subtle red accent line at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-red-300 opacity-0 group-hover:opacity-100 transition-opacity rounded-b-lg"></div>
+        <div className="absolute bottom-0 left-0 h-0.5 w-full bg-gradient-to-r from-[#9b1b36] via-[#cf6678] to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
       </CardContent>
     </Card>
   );

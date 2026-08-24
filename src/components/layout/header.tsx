@@ -39,13 +39,13 @@ export function Header({ className }: HeaderProps) {
   const userInitials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
 
   return (
-    <header className={`flex h-16 items-center justify-between border-b border-gray-200 bg-white shadow-sm ${className}`}>
-      <div className="flex items-center space-x-4 px-6">
+    <header className={`flex h-[4.5rem] items-center justify-between border-b border-slate-200/80 bg-white/90 shadow-[0_1px_0_rgb(15_23_42/.02)] backdrop-blur ${className}`}>
+      <div className="flex items-center space-x-3 px-5 sm:px-6">
         {/* Mobile Menu Button */}
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden text-gray-600 hover:text-red-600 hover:bg-red-50"
+          className="text-slate-500 hover:bg-slate-100 hover:text-slate-900 md:hidden"
           onClick={toggleMobileSidebar}
         >
           <Menu className="h-5 w-5" />
@@ -55,38 +55,38 @@ export function Header({ className }: HeaderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="hidden md:flex text-gray-600 hover:text-red-600 hover:bg-red-50"
+          className="hidden text-slate-500 hover:bg-slate-100 hover:text-slate-900 md:flex"
           onClick={toggleSidebar}
         >
           <Menu className="h-5 w-5" />
         </Button>
 
         {/* Search */}
-        <div className="relative hidden sm:block w-64">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <div className="relative hidden w-64 lg:block">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             type="search"
             placeholder="Search agents, trainings..."
-            className="pl-10 border-gray-300 focus:border-red-500 focus:ring-red-500"
+            className="h-10 rounded-lg border-slate-200 bg-slate-50/70 pl-10 text-sm shadow-none focus:bg-white"
           />
         </div>
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center space-x-4 px-6">
+      <div className="flex items-center space-x-2 px-4 sm:space-x-3 sm:px-6">
         {/* Quick Stats */}
         <div className="hidden lg:flex items-center space-x-4 text-sm">
-          <div className="text-center bg-red-50 rounded-lg px-3 py-2 border border-red-100">
-            <p className="font-semibold text-red-700">94.2%</p>
-            <p className="text-xs text-red-600">Compliance</p>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-center">
+            <p className="font-semibold text-slate-800">94.2%</p>
+            <p className="text-[11px] text-slate-500">Compliance</p>
           </div>
-          <div className="text-center bg-gray-50 rounded-lg px-3 py-2 border border-gray-200">
-            <p className="font-semibold text-gray-900">2,481</p>
-            <p className="text-xs text-gray-600">Agents</p>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-center">
+            <p className="font-semibold text-slate-800">2,481</p>
+            <p className="text-[11px] text-slate-500">Agents</p>
           </div>
-          <div className="text-center bg-red-50 rounded-lg px-3 py-2 border border-red-100">
-            <p className="font-semibold text-red-700">186</p>
-            <p className="text-xs text-red-600">Trainings</p>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-center">
+            <p className="font-semibold text-slate-800">186</p>
+            <p className="text-[11px] text-slate-500">Trainings</p>
           </div>
         </div>
 
@@ -94,7 +94,7 @@ export function Header({ className }: HeaderProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="relative text-gray-600 hover:text-red-600 hover:bg-red-50"
+          className="relative text-slate-500 hover:bg-slate-100 hover:text-slate-900"
           onClick={toggleNotificationPanel}
         >
           <Bell className="h-5 w-5" />
@@ -112,7 +112,7 @@ export function Header({ className }: HeaderProps) {
         <Button 
           variant="ghost" 
           size="icon" 
-          className="text-gray-600 hover:text-red-600 hover:bg-red-50"
+          className="text-slate-500 hover:bg-slate-100 hover:text-slate-900"
         >
           <HelpCircle className="h-5 w-5" />
         </Button>
@@ -120,9 +120,9 @@ export function Header({ className }: HeaderProps) {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:bg-red-50">
+            <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-slate-100">
               <Avatar className="h-9 w-9">
-                <AvatarFallback className="bg-button-gradient text-white">
+                <AvatarFallback className="bg-button-gradient text-xs font-semibold text-white">
                   {userInitials}
                 </AvatarFallback>
               </Avatar>

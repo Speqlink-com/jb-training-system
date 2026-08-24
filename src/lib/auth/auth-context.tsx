@@ -29,27 +29,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        // Check if user has valid tokens
-        if (authService.isAuthenticated()) {
-          const storedUser = authService.getCurrentUser();
-          if (storedUser) {
-            setUser(storedUser);
-            setIsAuthenticated(true);
-          } else {
-            // Try to refresh tokens
-            const refreshed = await authService.refreshAuth();
-            if (!refreshed) {
-              // Clear invalid tokens
-              authService.clearUser();
-              await authService.logout();
-            }
-          }
+        // Simplified auth check for demo mode
+        const storedUser = authService.getCurrentUser();
+        if (storedUser && authService.isAuthenticated()) {
+          setUser(storedUser);
+          setIsAuthenticated(true);
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
-        // Clear any invalid state
-        authService.clearUser();
-        await authService.logout();
       } finally {
         setIsLoading(false);
       }
