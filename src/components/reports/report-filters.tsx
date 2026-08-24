@@ -83,7 +83,7 @@ export function ReportFilters({ filters, onFiltersChange }: ReportFiltersProps) 
 
   const handleQuickRange = (range: string) => {
     const now = new Date();
-    let startDate = new Date();
+    const startDate = new Date();
 
     switch (range) {
       case "7d":
