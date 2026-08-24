@@ -66,7 +66,7 @@ export default function Home() {
               <Button 
                 onClick={() => router.push('/auth/login')}
                 size="lg"
-                className="btn-solid-primary"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
               >
                 Sign In
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -107,7 +107,7 @@ export default function Home() {
             <Button 
               onClick={() => router.push('/auth/login')}
               size="lg"
-              className="btn-solid-primary px-8"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 px-8"
             >
               Get Started
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -116,7 +116,7 @@ export default function Home() {
               onClick={() => router.push('/setup')}
               variant="outline"
               size="lg"
-              className="btn-outline-enhanced px-8"
+              className="border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 px-8"
             >
               <Globe className="mr-2 h-5 w-5" />
               Live Demo
@@ -205,7 +205,7 @@ export default function Home() {
         {/* Feature Showcase */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <PrimaryCard>
-            <div className="admin-card-header">
+            <div className="p-6 border-b bg-gradient-to-r from-primary to-primary/80">
               <h3 className="text-xl font-bold text-white flex items-center gap-3">
                 <Shield className="h-6 w-6" />
                 Role-Based Access Control
@@ -267,7 +267,7 @@ export default function Home() {
             </div>
           </PrimaryCard>
           <SuccessCard>
-            <div className="admin-card-header">
+            <div className="p-6 border-b bg-gradient-to-r from-green-600 to-green-500">
               <h3 className="text-xl font-bold text-white flex items-center gap-3">
                 <CheckCircle className="h-6 w-6" />
                 Enterprise Ready
@@ -319,7 +319,7 @@ export default function Home() {
         {/* System Status */}
         <section>
           <ElevatedCard>
-            <div className="admin-card-header">
+            <div className="p-6 border-b bg-gradient-to-r from-slate-700 to-slate-600">
               <h3 className="text-xl font-bold flex items-center gap-3">
                 <Zap className="h-6 w-6 text-primary" />
                 System Status & Integration
