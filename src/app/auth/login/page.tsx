@@ -98,11 +98,39 @@ export default function LoginPage() {
             </div>
             
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">
-                Demo Credentials (if setup already completed):
+              <p className="text-sm text-muted-foreground mb-3">
+                Demo Credentials for Presentation:
               </p>
-              <div className="mt-2 space-y-1 text-xs">
-                <p><strong>Super Admin:</strong> admin@trainsyt.com / Admin123!@#</p>
+              <div className="space-y-2 text-xs bg-muted/30 p-4 rounded-lg">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="font-semibold text-primary">Super Admin</p>
+                    <p>admin@trainsyt.com</p>
+                    <p>Admin123!@#</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-blue-600">Head of Agency</p>
+                    <p>hoa@trainsyt.com</p>
+                    <p>HOA123!@#</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-green-600">Sales Manager</p>
+                    <p>manager@trainsyt.com</p>
+                    <p>Manager123!@#</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-purple-600">Trainer</p>
+                    <p>trainer@trainsyt.com</p>
+                    <p>Trainer123!@#</p>
+                  </div>
+                </div>
+                <div className="pt-2 border-t">
+                  <div>
+                    <p className="font-semibold text-orange-600">Agent</p>
+                    <p>agent@trainsyt.com</p>
+                    <p>Agent123!@#</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
