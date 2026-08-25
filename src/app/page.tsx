@@ -51,101 +51,101 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Navigation Header */}
       <header className="border-b bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl shadow-lg">
-                <GraduationCap className="h-6 w-6 text-white" />
+            <div className="min-w-0 flex items-center space-x-2.5 sm:space-x-3">
+              <div className="rounded-xl bg-button-gradient p-2 shadow-lg">
+                <GraduationCap className="h-5 w-5 text-white sm:h-6 sm:w-6" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">TrainSyt</h1>
-                <p className="text-xs text-slate-500">Training Management Platform</p>
+                <h1 className="text-base font-bold text-slate-950 sm:text-xl">Jubilee Learning Hub</h1>
+                <p className="hidden text-xs text-slate-500 sm:block">Training Management Platform</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <ApiStatus />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="hidden sm:block"><ApiStatus /></div>
               <Button 
                 onClick={() => router.push('/auth/login')}
-                size="lg"
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                size="sm"
+                className="bg-button-gradient px-3 text-white shadow-lg sm:h-10 sm:px-5"
               >
                 Sign In
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="hidden h-4 w-4 sm:block" />
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-16 space-y-24">
+      <main className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:space-y-20 sm:px-6 sm:py-14 lg:space-y-24 lg:py-16">
         {/* Hero Section */}
-        <section className="text-center space-y-12 py-20">
-          <div className="space-y-8">
-            <div className="flex items-center justify-center gap-6 mb-8">
-              <div className="px-6 py-3 bg-gradient-to-r from-emerald-100 to-teal-100 border border-emerald-200 rounded-full">
+        <section className="space-y-7 py-4 text-center sm:space-y-10 sm:py-12">
+          <div className="space-y-6 sm:space-y-8">
+            <div className="mb-5 flex flex-wrap items-center justify-center gap-2 sm:mb-8 sm:gap-4">
+              <div className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 sm:px-5 sm:py-2.5">
                 <div className="flex items-center gap-2 text-emerald-700">
                   <Zap className="h-4 w-4" />
-                  <span className="text-sm font-medium">Enterprise Ready</span>
+                  <span className="text-xs font-medium sm:text-sm">Enterprise Ready</span>
                 </div>
               </div>
-              <div className="px-6 py-3 bg-gradient-to-r from-indigo-100 to-purple-100 border border-indigo-200 rounded-full">
-                <div className="flex items-center gap-2 text-indigo-700">
+              <div className="rounded-full border border-rose-200 bg-rose-50 px-3 py-2 sm:px-5 sm:py-2.5">
+                <div className="flex items-center gap-2 text-[#9b1b36]">
                   <Shield className="h-4 w-4" />
-                  <span className="text-sm font-medium">Secure & Compliant</span>
+                  <span className="text-xs font-medium sm:text-sm">Secure & Compliant</span>
                 </div>
               </div>
             </div>
             
-            <div className="space-y-6">
-              <h1 className="text-7xl font-bold leading-tight">
-                <span className="bg-gradient-to-r from-slate-900 via-indigo-800 to-purple-800 bg-clip-text text-transparent">
+            <div className="space-y-4 sm:space-y-6">
+              <h1 className="text-4xl font-bold leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl">
+                <span className="text-slate-950">
                   Transform Your
                 </span>
                 <br />
-                <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#8f1933] to-[#c8465d] bg-clip-text text-transparent">
                   Training Management
                 </span>
               </h1>
               
-              <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed font-light">
+              <p className="mx-auto max-w-3xl text-base leading-relaxed text-slate-600 sm:text-xl">
                 Complete enterprise solution for workforce training, compliance tracking, 
                 and performance management. Built for scale, security, and success.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-6">
+          <div className="mx-auto flex max-w-sm flex-col gap-3 sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-4">
             <Button 
               onClick={() => router.push('/auth/login')}
               size="lg"
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl px-10 py-4 text-lg font-semibold rounded-xl transition-all duration-300 hover:scale-105"
+              className="h-12 w-full bg-button-gradient text-base text-white shadow-xl sm:w-auto sm:px-8 sm:text-lg"
             >
               Get Started
-              <ArrowRight className="ml-3 h-6 w-6" />
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
               onClick={() => router.push('/setup')}
               variant="outline"
               size="lg"
-              className="border-2 border-slate-300 bg-white/80 hover:bg-white hover:shadow-xl px-10 py-4 text-lg font-semibold rounded-xl transition-all duration-300 hover:scale-105 text-slate-700"
+              className="h-12 w-full border-slate-300 bg-white px-6 text-base text-slate-900 sm:w-auto sm:px-8 sm:text-lg"
             >
-              <Globe className="mr-3 h-6 w-6" />
+              <Globe className="mr-2 h-5 w-5" />
               Live Demo
             </Button>
           </div>
         </section>
         {/* Platform Statistics */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
           <div className="group">
-            <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:bg-white/80">
-              <div className="flex items-center justify-between mb-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6">
+              <div className="mb-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-500 mb-2">Total Agents</p>
-                  <p className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-indigo-600 bg-clip-text text-transparent">2,481</p>
+                  <p className="text-3xl font-bold text-slate-950 sm:text-4xl">2,481</p>
                   <p className="text-xs text-slate-400 mt-1">Active across all branches</p>
                 </div>
-                <div className="p-4 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-2xl group-hover:from-indigo-200 group-hover:to-blue-200 transition-all duration-300">
-                  <Users className="h-10 w-10 text-indigo-600" />
+                <div className="rounded-xl bg-slate-100 p-3">
+                  <Users className="h-7 w-7 text-slate-700 sm:h-8 sm:w-8" />
                 </div>
               </div>
               <div className="flex items-center text-sm">
@@ -158,15 +158,15 @@ export default function Home() {
           </div>
 
           <div className="group">
-            <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:bg-white/80">
-              <div className="flex items-center justify-between mb-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6">
+              <div className="mb-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-500 mb-2">Active Trainings</p>
-                  <p className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-purple-600 bg-clip-text text-transparent">186</p>
+                  <p className="text-3xl font-bold text-slate-950 sm:text-4xl">186</p>
                   <p className="text-xs text-slate-400 mt-1">Sessions this month</p>
                 </div>
-                <div className="p-4 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-2xl group-hover:from-purple-200 group-hover:to-indigo-200 transition-all duration-300">
-                  <GraduationCap className="h-10 w-10 text-purple-600" />
+                <div className="rounded-xl bg-rose-50 p-3">
+                  <GraduationCap className="h-7 w-7 text-[#9b1b36] sm:h-8 sm:w-8" />
                 </div>
               </div>
               <div className="flex items-center text-sm">
@@ -179,15 +179,15 @@ export default function Home() {
           </div>
 
           <div className="group">
-            <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:bg-white/80">
-              <div className="flex items-center justify-between mb-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6">
+              <div className="mb-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-500 mb-2">Compliance Rate</p>
-                  <p className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-emerald-600 bg-clip-text text-transparent">94.7%</p>
+                  <p className="text-3xl font-bold text-slate-950 sm:text-4xl">94.7%</p>
                   <p className="text-xs text-slate-400 mt-1">Training completion</p>
                 </div>
-                <div className="p-4 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl group-hover:from-emerald-200 group-hover:to-teal-200 transition-all duration-300">
-                  <CheckCircle className="h-10 w-10 text-emerald-600" />
+                <div className="rounded-xl bg-emerald-50 p-3">
+                  <CheckCircle className="h-7 w-7 text-emerald-600 sm:h-8 sm:w-8" />
                 </div>
               </div>
               <div className="flex items-center text-sm">
@@ -200,15 +200,15 @@ export default function Home() {
           </div>
 
           <div className="group">
-            <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:bg-white/80">
-              <div className="flex items-center justify-between mb-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6">
+              <div className="mb-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-500 mb-2">Monthly Production</p>
-                  <p className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-violet-600 bg-clip-text text-transparent">KES 182M</p>
+                  <p className="text-3xl font-bold text-slate-950 sm:text-4xl">KES 182M</p>
                   <p className="text-xs text-slate-400 mt-1">Total this month</p>
                 </div>
-                <div className="p-4 bg-gradient-to-br from-violet-100 to-purple-100 rounded-2xl group-hover:from-violet-200 group-hover:to-purple-200 transition-all duration-300">
-                  <TrendingUp className="h-10 w-10 text-violet-600" />
+                <div className="rounded-xl bg-slate-100 p-3">
+                  <TrendingUp className="h-7 w-7 text-slate-700 sm:h-8 sm:w-8" />
                 </div>
               </div>
               <div className="flex items-center text-sm">
@@ -221,18 +221,17 @@ export default function Home() {
           </div>
         </section>
         {/* Feature Showcase */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500">
-            <div className="p-8 bg-gradient-to-r from-slate-700 to-slate-800">
-              <h3 className="text-2xl font-bold text-white flex items-center gap-3 mb-3">
-                <Shield className="h-7 w-7" />
+        <section className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-8">
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="bg-slate-800 p-5 sm:p-7">
+              <h3 className="mb-2 flex items-center gap-2 text-lg font-bold text-white sm:text-2xl">
+                <Shield className="h-5 w-5 sm:h-7 sm:w-7" />
                 Role-Based Access Control
               </h3>
-              <p className="text-white/90 text-lg">Secure, customized dashboards for every user role</p>
+              <p className="text-sm text-white/80 sm:text-lg">Secure, customized dashboards for every user role</p>
             </div>
-            <div className="p-8 space-y-4">
-              <div className="space-y-4">
-                <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border border-orange-100">
+            <div className="p-4 sm:p-6"><div className="space-y-3 sm:space-y-4">
+                <div className="flex items-start gap-3 rounded-xl border border-orange-100 bg-orange-50 p-3 sm:gap-4 sm:p-4">
                   <div className="p-2 bg-gradient-to-br from-orange-400 to-amber-500 rounded-lg">
                     <Settings className="h-5 w-5 text-white" />
                   </div>
@@ -242,7 +241,7 @@ export default function Home() {
                   </div>
                 </div>
                 
-                <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                <div className="flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 p-3 sm:gap-4 sm:p-4">
                   <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg">
                     <BarChart3 className="h-5 w-5 text-white" />
                   </div>
@@ -252,7 +251,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
+                <div className="flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-3 sm:gap-4 sm:p-4">
                   <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg">
                     <Target className="h-5 w-5 text-white" />
                   </div>
@@ -262,7 +261,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-xl border border-purple-100">
+                <div className="flex items-start gap-3 rounded-xl border border-purple-100 bg-purple-50 p-3 sm:gap-4 sm:p-4">
                   <div className="p-2 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg">
                     <GraduationCap className="h-5 w-5 text-white" />
                   </div>
@@ -272,7 +271,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-100">
+                <div className="flex items-start gap-3 rounded-xl border border-indigo-100 bg-indigo-50 p-3 sm:gap-4 sm:p-4">
                   <div className="p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg">
                     <Users className="h-5 w-5 text-white" />
                   </div>
@@ -284,37 +283,36 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500">
-            <div className="p-8 bg-gradient-to-r from-emerald-600 to-teal-600">
-              <h3 className="text-2xl font-bold text-white flex items-center gap-3 mb-3">
-                <CheckCircle className="h-7 w-7" />
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="bg-gradient-to-r from-emerald-700 to-teal-700 p-5 sm:p-7">
+              <h3 className="mb-2 flex items-center gap-2 text-lg font-bold text-white sm:text-2xl">
+                <CheckCircle className="h-5 w-5 sm:h-7 sm:w-7" />
                 Enterprise Ready
               </h3>
-              <p className="text-white/90 text-lg">Production-ready with complete backend integration</p>
+              <p className="text-sm text-white/80 sm:text-lg">Production-ready with complete backend integration</p>
             </div>
-            <div className="p-8 space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200">
-                  <CheckCircle className="h-6 w-6 text-emerald-600" />
-                  <span className="text-slate-700 font-medium text-lg">FastAPI Backend Integration</span>
+            <div className="space-y-5 p-4 sm:p-6"><div className="space-y-3 sm:space-y-4">
+                <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:gap-4 sm:p-4">
+                  <CheckCircle className="h-5 w-5 shrink-0 text-emerald-600" />
+                  <span className="text-sm font-medium text-slate-900 sm:text-lg">FastAPI Backend Integration</span>
                 </div>
                 
-                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:gap-4 sm:p-4">
                   <CheckCircle className="h-6 w-6 text-emerald-600" />
                   <span className="text-slate-700 font-medium text-lg">JWT Authentication & Sessions</span>
                 </div>
                 
-                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:gap-4 sm:p-4">
                   <CheckCircle className="h-6 w-6 text-emerald-600" />
                   <span className="text-slate-700 font-medium text-lg">Database & Migrations Ready</span>
                 </div>
                 
-                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:gap-4 sm:p-4">
                   <CheckCircle className="h-6 w-6 text-emerald-600" />
                   <span className="text-slate-700 font-medium text-lg">Role-Based Permissions</span>
                 </div>
                 
-                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:gap-4 sm:p-4">
                   <CheckCircle className="h-6 w-6 text-emerald-600" />
                   <span className="text-slate-700 font-medium text-lg">Responsive Design System</span>
                 </div>
@@ -336,17 +334,17 @@ export default function Home() {
         </section>
         {/* System Status */}
         <section>
-          <div className="bg-white/60 backdrop-blur-sm border border-white/50 rounded-3xl overflow-hidden shadow-2xl">
-            <div className="p-8 bg-gradient-to-r from-indigo-600 to-blue-600">
-              <h3 className="text-2xl font-bold text-white flex items-center gap-3 mb-3">
-                <Zap className="h-7 w-7" />
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-5 sm:p-7">
+              <h3 className="mb-2 flex items-center gap-2 text-lg font-bold text-white sm:text-2xl">
+                <Zap className="h-5 w-5 sm:h-7 sm:w-7" />
                 System Status & Integration
               </h3>
-              <p className="text-white/90 text-lg">Live system health and connectivity status</p>
+              <p className="text-sm text-white/80 sm:text-lg">Live system health and connectivity status</p>
             </div>
-            <div className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                <div className="text-center p-6 bg-gradient-to-br from-emerald-50 to-teal-100 rounded-2xl border border-emerald-200">
+            <div className="p-4 sm:p-6">
+              <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4 sm:mb-6">
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center sm:p-5">
                   <div className="p-4 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl w-fit mx-auto mb-4">
                     <CheckCircle className="h-8 w-8 text-white" />
                   </div>
@@ -355,7 +353,7 @@ export default function Home() {
                   <p className="text-xs text-emerald-500 font-medium">✅ Running</p>
                 </div>
                 
-                <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl border border-blue-200">
+                <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-center sm:p-5">
                   <div className="p-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl w-fit mx-auto mb-4">
                     <Shield className="h-8 w-8 text-white" />
                   </div>
@@ -364,7 +362,7 @@ export default function Home() {
                   <p className="text-xs text-blue-500 font-medium">✅ Integrated</p>
                 </div>
                 
-                <div className="text-center p-6 bg-gradient-to-br from-violet-50 to-purple-100 rounded-2xl border border-violet-200">
+                <div className="rounded-xl border border-violet-200 bg-violet-50 p-4 text-center sm:p-5">
                   <div className="p-4 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl w-fit mx-auto mb-4">
                     <Settings className="h-8 w-8 text-white" />
                   </div>
@@ -374,18 +372,18 @@ export default function Home() {
                 </div>
               </div>
               
-              <div className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-200">
-                <div className="flex items-start gap-4">
+              <div className="rounded-xl border border-rose-100 bg-rose-50 p-4 sm:p-6">
+                <div className="flex items-start gap-3 sm:gap-4">
                   <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl">
                     <Globe className="h-6 w-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-bold text-indigo-800 mb-2 text-xl">Ready for Deployment</p>
-                    <p className="text-slate-600 mb-4 leading-relaxed">
+                    <p className="mb-2 text-lg font-bold text-slate-950 sm:text-xl">Ready for Deployment</p>
+                    <p className="mb-4 text-sm leading-relaxed text-slate-600 sm:text-base">
                       Complete training management platform with role-based access control, 
                       secure authentication, and comprehensive dashboard system for all user types.
                     </p>
-                    <div className="flex items-center gap-6 text-sm text-slate-500">
+                    <div className="flex flex-col gap-2 text-xs text-slate-600 sm:flex-row sm:items-center sm:gap-4 sm:text-sm">
                       <span className="flex items-center gap-1">
                         <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
                         Multi-role Dashboard System
@@ -408,10 +406,10 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-white/70 backdrop-blur-md mt-24">
-        <div className="max-w-7xl mx-auto px-6 py-12">
+      <footer className="mt-14 border-t bg-white/70 backdrop-blur-md sm:mt-20">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <div className="text-center">
-            <p className="text-slate-500 text-lg">
+            <p className="text-sm text-slate-500 sm:text-lg">
               © 2024 TrainSyt Platform. Enterprise Training Management System.
             </p>
           </div>

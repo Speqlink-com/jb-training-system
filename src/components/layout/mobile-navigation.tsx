@@ -35,32 +35,32 @@ export function MobileNavigation({ isOpen }: MobileNavigationProps) {
   return (
     <div
       className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r transform transition-transform duration-300 ease-in-out md:hidden",
+        "fixed inset-y-0 left-0 z-50 flex w-[min(18rem,86vw)] flex-col border-r border-slate-700 bg-[image:var(--sidebar-gradient)] text-slate-200 shadow-2xl transition-transform duration-300 ease-in-out md:hidden",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}
     >
       {/* Header */}
-      <div className="flex h-16 items-center justify-between border-b px-6">
+      <div className="flex h-[4.5rem] items-center justify-between border-b border-white/10 px-5">
         <Link href="/dashboard" className="flex items-center space-x-2" onClick={closeMenu}>
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">TMP</span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-button-gradient">
+            <span className="text-sm font-bold text-white">TMP</span>
           </div>
-          <span className="font-semibold text-lg">Training Platform</span>
+          <span className="text-sm font-semibold text-white">Jubilee Learning Hub</span>
         </Link>
         
-        <Button variant="ghost" size="icon" onClick={closeMenu}>
+        <Button variant="ghost" size="icon" className="text-slate-300 hover:bg-white/10 hover:text-white" onClick={closeMenu}>
           <X className="h-5 w-5" />
         </Button>
       </div>
 
       {/* Navigation */}
       <ScrollArea className="flex-1 px-3 py-4">
-        <nav className="space-y-2">
+        <nav className="space-y-5">
           {navigation.map((group) => (
             <div key={group.title}>
               {/* Group Header */}
               <div className="px-3 py-2">
-                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                <p className="text-[10px] font-semibold uppercase tracking-[.14em] text-slate-500">
                   {group.title}
                 </p>
               </div>
@@ -73,10 +73,10 @@ export function MobileNavigation({ isOpen }: MobileNavigationProps) {
                     href={item.href}
                     onClick={closeMenu}
                     className={cn(
-                      "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+                      "flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-white/10 hover:text-white",
                       isActiveLink(item.href)
-                        ? "bg-accent text-accent-foreground"
-                        : "text-muted-foreground"
+                        ? "bg-white/12 text-white"
+                        : "text-slate-300"
                     )}
                   >
                     <item.icon className="mr-3 h-4 w-4" />
@@ -90,18 +90,18 @@ export function MobileNavigation({ isOpen }: MobileNavigationProps) {
       </ScrollArea>
 
       {/* User Profile Section */}
-      <div className="border-t p-4">
+      <div className="border-t border-white/10 p-4">
         <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground text-sm font-medium">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-button-gradient">
+            <span className="text-sm font-medium text-white">
               {user.firstName.charAt(0)}{user.lastName.charAt(0)}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">
+            <p className="truncate text-sm font-medium text-white">
               {user.firstName} {user.lastName}
             </p>
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="truncate text-xs text-slate-400">
               {user.role.replace('_', ' ')}
             </p>
           </div>
