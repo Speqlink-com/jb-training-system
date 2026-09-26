@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
-import { formatDate, formatCurrency } from "@/lib/utils";
+import { compareSortableValues, formatDate, formatCurrency } from "@/lib/utils";
 import { 
   MoreHorizontal, 
   Eye, 
@@ -71,7 +71,7 @@ interface HOA {
   };
   certifications: Array<{
     name: string;
-    status: "COMPLETED" | "IN_PROGRESS" | "PENDING" | "EXPIRED";
+    status: string;
     expiryDate: string | null;
   }>;
 }
@@ -110,24 +110,10 @@ export function HOAsTable({ hoas, filters }: HOAsTableProps) {
 
   // Sort HOAs
   const sortedHOAs = [...filteredHOAs].sort((a, b) => {
-    let aValue: any = a[sortBy as keyof HOA];
-    let bValue: any = b[sortBy as keyof HOA];
+    const getValue = (hoa: HOA): string | number =>
+      sortBy === "name" ? `${hoa.firstName} ${hoa.lastName}` : hoa.achievementRate;
 
-    if (sortBy === "name") {
-      aValue = `${a.firstName} ${a.lastName}`;
-      bValue = `${b.firstName} ${b.lastName}`;
-    }
-
-    if (typeof aValue === "string") {
-      aValue = aValue.toLowerCase();
-      bValue = bValue.toLowerCase();
-    }
-
-    if (sortOrder === "asc") {
-      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-    } else {
-      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-    }
+    return compareSortableValues(getValue(a), getValue(b), sortOrder);
   });
 
   const handleSort = (column: string) => {

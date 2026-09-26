@@ -1,427 +1,171 @@
 "use client";
 
-import { useState } from "react";
-import { ProtectedRoute } from "@/lib/auth/protected-route";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { Award, CheckCircle2, GraduationCap, Mail, MoreHorizontal, Plus, Search, ShieldCheck, Users, XCircle } from "lucide-react";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { NotificationPanel } from "@/components/layout/notification-panel";
-import { TrainersTable } from "@/components/workforce/trainers-table";
-import { TrainerFilters } from "@/components/workforce/trainer-filters";
-import { CreateTrainerDialog } from "@/components/workforce/create-trainer-dialog";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ExcelExportButton } from "@/components/common/excel-export-button";
+import { ProtectedRoute } from "@/lib/auth/protected-route";
+import { Role } from "@/config/permissions";
+import type { ExcelExportColumn } from "@/lib/export/excel";
+import {
+  getTrainers,
+  getTrainings,
+  PLATFORM_CHANGE_EVENT,
+  saveTrainers,
+  type LocalTrainer,
+} from "@/lib/local-platform";
 import { Button } from "@/components/ui/button";
-import { StatCard } from "@/components/dashboard/stat-card";
-import { Permission } from "@/config/permissions";
-import { TRAINING_CATEGORIES } from "@/config/constants";
-import { 
-  GraduationCap, 
-  Plus, 
-  Users,
-  Calendar,
-  Award,
-  TrendingUp,
-  Download,
-  BookOpen,
-  Clock,
-  CheckCircle
-} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-// Mock Trainers data
-const mockTrainers = [
-  {
-    id: "t1",
-    firstName: "John",
-    lastName: "Mwangi",
-    email: "john.mwangi@company.com",
-    phone: "+254701111111",
-    employeeId: "TR001",
-    specializations: ["AML", "SPECIALISED", "EXISTING_TARGETED"],
-    dateJoined: "2021-03-10T00:00:00Z",
-    status: "ACTIVE" as const,
-    totalTrainings: 24,
-    activeTrainings: 3,
-    completedTrainings: 21,
-    totalParticipants: 1250,
-    averageRating: 4.7,
-    certificationLevel: "Senior Trainer",
-    lastActivity: "2024-08-23T10:00:00Z",
-    monthlyStats: {
-      trainingsScheduled: 4,
-      trainingsCompleted: 3,
-      participantsTrained: 145,
-      averageAttendance: 94,
-      averageEffectiveness: 91
-    },
-    upcomingTrainings: [
-      {
-        id: "tr1",
-        title: "AML & Compliance Training",
-        scheduledDate: "2024-08-28T10:00:00Z",
-        expectedParticipants: 120,
-        location: "Nairobi CBD Training Center"
-      },
-      {
-        id: "tr2",
-        title: "Product Knowledge Update",
-        scheduledDate: "2024-09-05T09:00:00Z",
-        expectedParticipants: 85,
-        location: "Westlands Branch"
-      }
-    ],
-    certifications: [
-      { name: "Certified Professional Trainer", status: "COMPLETED", expiryDate: "2025-03-10" },
-      { name: "AML Specialist", status: "COMPLETED", expiryDate: "2024-12-15" },
-      { name: "Digital Learning", status: "IN_PROGRESS", expiryDate: null }
-    ]
-  },
-  {
-    id: "t2",
-    firstName: "Sarah",
-    lastName: "Wanjiku",
-    email: "sarah.wanjiku@company.com",
-    phone: "+254702222222",
-    employeeId: "TR002",
-    specializations: ["EXISTING_TARGETED", "NEW_AGENTS", "PRODUCT_MIX"],
-    dateJoined: "2022-07-15T00:00:00Z",
-    status: "ACTIVE" as const,
-    totalTrainings: 18,
-    activeTrainings: 2,
-    completedTrainings: 16,
-    totalParticipants: 920,
-    averageRating: 4.8,
-    certificationLevel: "Senior Trainer",
-    lastActivity: "2024-08-22T16:30:00Z",
-    monthlyStats: {
-      trainingsScheduled: 3,
-      trainingsCompleted: 2,
-      participantsTrained: 98,
-      averageAttendance: 97,
-      averageEffectiveness: 94
-    },
-    upcomingTrainings: [
-      {
-        id: "tr3",
-        title: "New Agent Induction",
-        scheduledDate: "2024-09-10T08:00:00Z",
-        expectedParticipants: 45,
-        location: "Head Office Training Facility"
-      }
-    ],
-    certifications: [
-      { name: "Certified Professional Trainer", status: "COMPLETED", expiryDate: "2025-07-15" },
-      { name: "Product Specialist", status: "COMPLETED", expiryDate: "2025-01-20" },
-      { name: "Leadership Development", status: "COMPLETED", expiryDate: "2024-11-30" }
-    ]
-  },
-  {
-    id: "t3",
-    firstName: "Peter",
-    lastName: "Kimani",
-    email: "peter.kimani@company.com",
-    phone: "+254703333333",
-    employeeId: "TR003",
-    specializations: ["NEW_AGENTS", "ALTERNATIVE_DISTRIBUTION"],
-    dateJoined: "2023-01-20T00:00:00Z",
-    status: "ACTIVE" as const,
-    totalTrainings: 12,
-    activeTrainings: 1,
-    completedTrainings: 11,
-    totalParticipants: 580,
-    averageRating: 4.5,
-    certificationLevel: "Trainer",
-    lastActivity: "2024-08-21T14:15:00Z",
-    monthlyStats: {
-      trainingsScheduled: 2,
-      trainingsCompleted: 1,
-      participantsTrained: 52,
-      averageAttendance: 89,
-      averageEffectiveness: 87
-    },
-    upcomingTrainings: [
-      {
-        id: "tr4",
-        title: "Digital Transformation Workshop",
-        scheduledDate: "2024-09-15T13:00:00Z",
-        expectedParticipants: 200,
-        location: "Virtual (Zoom)"
-      }
-    ],
-    certifications: [
-      { name: "Certified Professional Trainer", status: "IN_PROGRESS", expiryDate: null },
-      { name: "Digital Trainer", status: "COMPLETED", expiryDate: "2025-01-20" },
-      { name: "New Hire Specialist", status: "COMPLETED", expiryDate: "2024-10-15" }
-    ]
-  },
-  {
-    id: "t4",
-    firstName: "Grace",
-    lastName: "Akinyi",
-    email: "grace.akinyi@company.com",
-    phone: "+254704444444",
-    employeeId: "TR004",
-    specializations: ["ALTERNATIVE_DISTRIBUTION", "SPECIALISED"],
-    dateJoined: "2022-11-05T00:00:00Z",
-    status: "ACTIVE" as const,
-    totalTrainings: 15,
-    activeTrainings: 2,
-    completedTrainings: 13,
-    totalParticipants: 750,
-    averageRating: 4.6,
-    certificationLevel: "Senior Trainer",
-    lastActivity: "2024-08-23T11:20:00Z",
-    monthlyStats: {
-      trainingsScheduled: 3,
-      trainingsCompleted: 2,
-      participantsTrained: 112,
-      averageAttendance: 92,
-      averageEffectiveness: 89
-    },
-    upcomingTrainings: [
-      {
-        id: "tr5",
-        title: "Technology Integration",
-        scheduledDate: "2024-09-12T10:00:00Z",
-        expectedParticipants: 75,
-        location: "Tech Hub"
-      }
-    ],
-    certifications: [
-      { name: "Certified Professional Trainer", status: "COMPLETED", expiryDate: "2025-11-05" },
-      { name: "Technology Specialist", status: "COMPLETED", expiryDate: "2025-05-15" },
-      { name: "Advanced Analytics", status: "PENDING", expiryDate: null }
-    ]
-  }
+const columns: ExcelExportColumn<LocalTrainer>[] = [
+  { header: "Employee ID", value: (row) => row.employeeId, width: 16 },
+  { header: "First name", value: (row) => row.firstName, width: 18 },
+  { header: "Last name", value: (row) => row.lastName, width: 18 },
+  { header: "Email", value: (row) => row.email, width: 30 },
+  { header: "Phone", value: (row) => row.phone, width: 20 },
+  { header: "Specializations", value: (row) => row.specializations.join(", "), width: 36 },
+  { header: "Status", value: (row) => row.status, width: 14 },
+  { header: "Joined", value: (row) => new Date(row.joinedAt), width: 16, numberFormat: "dd-mmm-yyyy" },
 ];
 
-function TrainersContent() {
-  const [filters, setFilters] = useState({
-    search: "",
-    specialization: "",
-    status: "",
-    certificationLevel: "",
-    ratingRange: { min: "", max: "" },
-  });
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
+function TrainerWorkspace() {
+  const [trainers, setTrainers] = useState<LocalTrainer[]>([]);
+  const [search, setSearch] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-  const totalTrainers = mockTrainers.length;
-  const activeTrainers = mockTrainers.filter(t => t.status === "ACTIVE").length;
-  const totalTrainings = mockTrainers.reduce((sum, t) => sum + t.totalTrainings, 0);
-  const totalParticipants = mockTrainers.reduce((sum, t) => sum + t.totalParticipants, 0);
-  const averageRating = Number(
-    (mockTrainers.reduce((sum, t) => sum + t.averageRating, 0) / mockTrainers.length).toFixed(1)
-  );
+  const refresh = () => setTrainers(getTrainers());
+  useEffect(() => {
+    const timer = window.setTimeout(refresh, 0);
+    window.addEventListener(PLATFORM_CHANGE_EVENT, refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener(PLATFORM_CHANGE_EVENT, refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
+
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return trainers.filter((trainer) => !query || [trainer.firstName, trainer.lastName, trainer.email, trainer.employeeId, ...trainer.specializations].join(" ").toLowerCase().includes(query));
+  }, [search, trainers]);
+
+  const trainingCounts = useMemo(() => {
+    return getTrainings().reduce<Record<string, number>>((counts, training) => {
+      counts[training.trainerId] = (counts[training.trainerId] || 0) + 1;
+      return counts;
+    }, {});
+  }, []);
+
+  const toggleStatus = (trainer: LocalTrainer) => {
+    saveTrainers(trainers.map((item) => item.id === trainer.id ? {
+      ...item,
+      status: item.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+    } : item));
+  };
+
+  const removeTrainer = (trainer: LocalTrainer) => {
+    if ((trainingCounts[trainer.id] || 0) > 0) {
+      window.alert("This trainer still owns training programmes. Reassign those programmes before removal.");
+      return;
+    }
+    if (window.confirm(`Remove ${trainer.firstName} ${trainer.lastName} from the trainer directory?`)) {
+      saveTrainers(trainers.filter((item) => item.id !== trainer.id));
+    }
+  };
+
+  const active = trainers.filter((trainer) => trainer.status === "ACTIVE").length;
+  const specializations = new Set(trainers.flatMap((trainer) => trainer.specializations)).size;
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-[1440px] space-y-7 px-5 py-7 sm:px-8 lg:px-12 lg:py-10">
+      <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Training Team</h1>
-          <p className="text-muted-foreground">
-            Manage trainers, track training delivery, and monitor effectiveness
-          </p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.19em] text-[#9b1b36]">Administration · People</p>
+          <h1 className="mt-2 text-4xl font-bold tracking-[-0.045em] text-[#171d25]">Trainer control centre</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">Control trainer access, ownership and programme readiness from one operational view.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export Reports
-          </Button>
-          <Button onClick={() => setShowCreateDialog(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Trainer
-          </Button>
+        <div className="flex flex-wrap gap-2">
+          <ExcelExportButton columns={columns} rows={trainers} fileName="jubilee-trainers" sheetName="Trainers" title="Jubilee trainer directory" />
+          <Button onClick={() => setDialogOpen(true)} className="bg-[#9b1b36] hover:bg-[#7b172e]"><Plus className="mr-2 h-4 w-4" />Add trainer</Button>
         </div>
-      </div>
+      </header>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard
-          title="Total Trainers"
-          value={totalTrainers.toString()}
-          description="Active training team"
-          icon={GraduationCap}
-        />
-        <StatCard
-          title="Active Trainers"
-          value={activeTrainers.toString()}
-          description="Currently available"
-          icon={Users}
-          trend={{ value: 2, isPositive: true }}
-        />
-        <StatCard
-          title="Total Trainings"
-          value={totalTrainings.toString()}
-          description="Sessions delivered"
-          icon={BookOpen}
-          trend={{ value: 8, isPositive: true }}
-        />
-        <StatCard
-          title="Participants"
-          value={totalParticipants.toString()}
-          description="People trained"
-          icon={Users}
-          trend={{ value: 15, isPositive: true }}
-        />
-        <StatCard
-          title="Avg Rating"
-          value={`${averageRating}/5`}
-          description="Training quality"
-          icon={Award}
-          trend={{ value: 0.2, isPositive: true }}
-        />
-      </div>
+      <section className="grid gap-4 sm:grid-cols-3">
+        {[
+          { label: "Total trainers", value: trainers.length, icon: Users, note: "Registered facilitators" },
+          { label: "Active access", value: active, icon: CheckCircle2, note: "Able to enter the workspace" },
+          { label: "Capabilities", value: specializations, icon: Award, note: "Specialist areas covered" },
+        ].map(({ label, value, icon: Icon, note }) => (
+          <Card key={label} className="border-[#dce1e3] shadow-none"><CardContent className="flex items-start justify-between p-5"><div><p className="text-sm font-medium text-slate-500">{label}</p><p className="mt-2 text-3xl font-bold tracking-tight text-slate-900">{value}</p><p className="mt-1 text-xs text-slate-400">{note}</p></div><span className="grid h-10 w-10 place-items-center rounded-lg bg-[#f7ecef] text-[#9b1b36]"><Icon className="h-5 w-5" /></span></CardContent></Card>
+        ))}
+      </section>
 
-      {/* Training Specializations */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Training Specializations</CardTitle>
-          <CardDescription>
-            Trainer expertise across different training categories
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(TRAINING_CATEGORIES).map(([key, value]) => {
-              const specialistCount = mockTrainers.filter(t => 
-                t.specializations.includes(key as any)
-              ).length;
-              
-              return (
-                <div key={key} className="p-4 border rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium">{value}</h4>
-                    <span className="text-2xl font-bold text-primary">
-                      {specialistCount}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {specialistCount > 0 ? "Available specialists" : "No specialists"}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      <section className="overflow-hidden rounded-xl border border-[#dce1e3] bg-white">
+        <div className="flex flex-col gap-4 border-b border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div><h2 className="font-semibold text-slate-900">Trainer directory</h2><p className="mt-1 text-xs text-slate-500">Inactive trainers are blocked at their next login.</p></div>
+          <div className="relative w-full sm:w-80"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search trainers" className="pl-9" /></div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[820px] text-left text-sm">
+            <thead className="bg-[#f8f9fa] text-[10px] uppercase tracking-[0.12em] text-slate-500"><tr><th className="px-5 py-3 font-semibold">Trainer</th><th className="px-5 py-3 font-semibold">Capabilities</th><th className="px-5 py-3 font-semibold">Programmes</th><th className="px-5 py-3 font-semibold">Access</th><th className="w-14 px-5 py-3" /></tr></thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.map((trainer) => (
+                <tr key={trainer.id} className="hover:bg-slate-50/70">
+                  <td className="px-5 py-4"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-full bg-[#641329] text-xs font-bold text-white">{trainer.firstName[0]}{trainer.lastName[0]}</span><div><p className="font-semibold text-slate-900">{trainer.firstName} {trainer.lastName}</p><p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500"><Mail className="h-3 w-3" />{trainer.email}</p></div></div></td>
+                  <td className="px-5 py-4"><div className="flex max-w-sm flex-wrap gap-1.5">{trainer.specializations.map((item) => <Badge key={item} variant="outline" className="font-medium">{item}</Badge>)}</div></td>
+                  <td className="px-5 py-4"><p className="font-semibold text-slate-800">{trainingCounts[trainer.id] || 0}</p><p className="text-xs text-slate-400">assigned</p></td>
+                  <td className="px-5 py-4"><Badge className={trainer.status === "ACTIVE" ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-50" : "bg-slate-100 text-slate-600 hover:bg-slate-100"}>{trainer.status === "ACTIVE" ? <CheckCircle2 className="mr-1 h-3 w-3" /> : <XCircle className="mr-1 h-3 w-3" />}{trainer.status}</Badge></td>
+                  <td className="px-5 py-4"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onClick={() => toggleStatus(trainer)}>{trainer.status === "ACTIVE" ? "Deactivate access" : "Restore access"}</DropdownMenuItem><DropdownMenuItem className="text-red-600" onClick={() => removeTrainer(trainer)}>Remove trainer</DropdownMenuItem></DropdownMenuContent></DropdownMenu></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-      {/* Current Training Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Training Activity</CardTitle>
-            <CardDescription>
-              Current and upcoming training sessions
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {mockTrainers
-                .filter(trainer => trainer.upcomingTrainings.length > 0)
-                .map(trainer => (
-                  trainer.upcomingTrainings.map(training => (
-                    <div key={training.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <Calendar className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium">{training.title}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {trainer.firstName} {trainer.lastName} • {training.expectedParticipants} participants
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(training.scheduledDate).toLocaleDateString()} at {training.location}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-sm font-medium">
-                          {new Date(training.scheduledDate).toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric' 
-                          })}
-                        </span>
-                      </div>
-                    </div>
-                  ))
-                ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Performers</CardTitle>
-            <CardDescription>
-              Highest rated trainers this month
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {mockTrainers
-                .sort((a, b) => b.averageRating - a.averageRating)
-                .slice(0, 4)
-                .map((trainer, index) => (
-                  <div key={trainer.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold">
-                      {index + 1}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">
-                        {trainer.firstName} {trainer.lastName}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {trainer.certificationLevel} • {trainer.totalTrainings} sessions
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-primary">{trainer.averageRating}/5</p>
-                      <p className="text-sm text-muted-foreground">
-                        {trainer.totalParticipants} trained
-                      </p>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Trainers Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Trainers</CardTitle>
-          <CardDescription>
-            Complete list of trainers with performance and specialization details
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <TrainerFilters 
-            filters={filters}
-            onFiltersChange={setFilters}
-          />
-          <TrainersTable 
-            trainers={mockTrainers}
-            filters={filters}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Create Trainer Dialog */}
-      <CreateTrainerDialog
-        open={showCreateDialog}
-        onOpenChange={setShowCreateDialog}
-      />
+      <AddTrainerDialog open={dialogOpen} onOpenChange={setDialogOpen} trainers={trainers} />
     </div>
   );
 }
 
+function AddTrainerDialog({ open, onOpenChange, trainers }: { open: boolean; onOpenChange: (open: boolean) => void; trainers: LocalTrainer[] }) {
+  const [error, setError] = useState("");
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const email = String(data.get("email") || "").trim().toLowerCase();
+    if (trainers.some((trainer) => trainer.email === email)) { setError("A trainer with this email already exists."); return; }
+    const specializations = String(data.get("specializations") || "").split(",").map((item) => item.trim()).filter(Boolean);
+    const trainer: LocalTrainer = {
+      id: `trainer-${Date.now()}`,
+      firstName: String(data.get("firstName") || "").trim(),
+      lastName: String(data.get("lastName") || "").trim(),
+      email,
+      phone: String(data.get("phone") || "").trim(),
+      employeeId: String(data.get("employeeId") || "").trim(),
+      specializations,
+      status: "ACTIVE",
+      joinedAt: new Date().toISOString(),
+    };
+    saveTrainers([...trainers, trainer]);
+    setError("");
+    onOpenChange(false);
+    event.currentTarget.reset();
+  };
+  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="sm:max-w-xl"><DialogHeader><DialogTitle className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-[#9b1b36]" />Add a trainer</DialogTitle><DialogDescription>Create a local trainer profile. Authentication remains limited to the listed hardcoded demo accounts.</DialogDescription></DialogHeader><form onSubmit={submit} className="space-y-4">{error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}<div className="grid gap-4 sm:grid-cols-2"><Field label="First name" name="firstName" /><Field label="Last name" name="lastName" /><Field label="Email" name="email" type="email" /><Field label="Phone" name="phone" /><Field label="Employee ID" name="employeeId" /><Field label="Specializations" name="specializations" placeholder="Compliance, Product knowledge" /></div><DialogFooter><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="submit" className="bg-[#9b1b36] hover:bg-[#7b172e]"><GraduationCap className="mr-2 h-4 w-4" />Add trainer</Button></DialogFooter></form></DialogContent></Dialog>;
+}
+
+function Field({ label, name, type = "text", placeholder }: { label: string; name: string; type?: string; placeholder?: string }) {
+  return <div className="space-y-2"><Label htmlFor={name}>{label}</Label><Input id={name} name={name} type={type} placeholder={placeholder} required /></div>;
+}
+
 export default function TrainersPage() {
-  return (
-    <ProtectedRoute 
-      requiredPermissions={[Permission.TRAININGS_READ]}
-    >
-      <DashboardShell>
-        <TrainersContent />
-        <NotificationPanel />
-      </DashboardShell>
-    </ProtectedRoute>
-  );
+  return <ProtectedRoute requiredRoles={[Role.ADMIN]}><DashboardShell><TrainerWorkspace /><NotificationPanel /></DashboardShell></ProtectedRoute>;
 }

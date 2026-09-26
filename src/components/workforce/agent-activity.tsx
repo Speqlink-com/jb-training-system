@@ -1,5 +1,4 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDate, formatRelativeTime, getInitials } from "@/lib/utils";
 import { 
@@ -8,10 +7,7 @@ import {
   GraduationCap, 
   User, 
   Phone,
-  Mail,
-  Edit,
   CheckCircle,
-  AlertCircle,
   Clock
 } from "lucide-react";
 
@@ -119,7 +115,9 @@ const mockActivities = [
       branch: "Nairobi CBD"
     }
   }
-];
+] as const;
+
+type AgentActivityItem = (typeof mockActivities)[number];
 
 export function AgentActivity({ agentId }: AgentActivityProps) {
   const getActivityIcon = (type: string) => {
@@ -163,7 +161,7 @@ export function AgentActivity({ agentId }: AgentActivityProps) {
     }
   };
 
-  const renderMetadata = (activity: any) => {
+  const renderMetadata = (activity: AgentActivityItem) => {
     switch (activity.type) {
       case "TRAINING_COMPLETED":
         return (
@@ -199,7 +197,7 @@ export function AgentActivity({ agentId }: AgentActivityProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-agent-id={agentId}>
       {/* Activity Overview */}
       <Card>
         <CardHeader>

@@ -98,7 +98,7 @@ export function OnboardingPipeline({ candidates }: OnboardingPipelineProps) {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
             {pipelineStages.map((stage, index) => {
-              const stageIcon = stage.icon;
+              const StageIcon = stage.icon;
               const candidatesInStage = getCandidatesInStage(stage.id);
               const count = candidatesInStage.length;
               
@@ -106,7 +106,7 @@ export function OnboardingPipeline({ candidates }: OnboardingPipelineProps) {
                 <div key={stage.id} className="relative">
                   <div className="text-center">
                     <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full ${stage.color} mb-3`}>
-                      <stageIcon className="h-6 w-6" />
+                      <StageIcon className="h-6 w-6" />
                     </div>
                     <h3 className="font-medium text-sm">{stage.title}</h3>
                     <p className="text-xs text-muted-foreground mb-2">{stage.description}</p>

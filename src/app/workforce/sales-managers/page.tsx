@@ -10,6 +10,8 @@ import { CreateSalesManagerDialog } from "@/components/workforce/create-sales-ma
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { ExcelExportButton } from "@/components/common/excel-export-button";
+import type { ExcelExportColumn } from "@/lib/export/excel";
 import { Permission } from "@/config/permissions";
 import { 
   Users, 
@@ -18,7 +20,6 @@ import {
   Target,
   TrendingUp,
   Award,
-  Download,
   Calendar,
   Building2
 } from "lucide-react";
@@ -135,6 +136,27 @@ const mockSalesManagers = [
   }
 ];
 
+type SalesManagerExportRow = (typeof mockSalesManagers)[number];
+
+const salesManagerExportColumns: ExcelExportColumn<SalesManagerExportRow>[] = [
+  { header: "Employee ID", value: (manager) => manager.employeeId, width: 16 },
+  { header: "First name", value: (manager) => manager.firstName, width: 18 },
+  { header: "Last name", value: (manager) => manager.lastName, width: 18 },
+  { header: "Email", value: (manager) => manager.email, width: 30 },
+  { header: "Phone", value: (manager) => manager.phone, width: 18 },
+  { header: "Region", value: (manager) => manager.region, width: 16 },
+  { header: "Branch", value: (manager) => manager.branch.name, width: 20 },
+  { header: "Date joined", value: (manager) => new Date(manager.dateJoined), width: 16, numberFormat: "dd-mmm-yyyy" },
+  { header: "Status", value: (manager) => manager.status, width: 14 },
+  { header: "Team size", value: (manager) => manager.teamSize, width: 14 },
+  { header: "Active agents", value: (manager) => manager.activeAgents, width: 16 },
+  { header: "Monthly target", value: (manager) => manager.monthlyTarget, width: 18, numberFormat: '"KES" #,##0' },
+  { header: "Monthly achievement", value: (manager) => manager.monthlyAchievement, width: 22, numberFormat: '"KES" #,##0' },
+  { header: "Achievement rate", value: (manager) => manager.achievementRate, width: 18, numberFormat: '0"%"' },
+  { header: "Training compliance", value: (manager) => manager.trainingCompliance, width: 20, numberFormat: '0"%"' },
+  { header: "Customer satisfaction", value: (manager) => manager.performance.customerSatisfaction, width: 22, numberFormat: "0.0" },
+];
+
 function SalesManagersContent() {
   const [filters, setFilters] = useState({
     search: "",
@@ -163,10 +185,13 @@ function SalesManagersContent() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export Data
-          </Button>
+          <ExcelExportButton
+            columns={salesManagerExportColumns}
+            rows={mockSalesManagers}
+            fileName="sales-managers"
+            sheetName="Sales managers"
+            title="Sales manager performance"
+          />
           <Button onClick={() => setShowCreateDialog(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Add Sales Manager

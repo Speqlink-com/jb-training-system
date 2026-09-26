@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { ExcelExportButton } from "@/components/common/excel-export-button";
+import type { ExcelExportColumn } from "@/lib/export/excel";
 import { Permission } from "@/config/permissions";
 import { 
   Users, 
@@ -17,7 +19,6 @@ import {
   CheckCircle, 
   AlertTriangle,
   TrendingUp,
-  Download
 } from "lucide-react";
 
 // Mock data for agents - replace with API calls
@@ -75,6 +76,26 @@ const mockAgents = [
   },
 ];
 
+type AgentExportRow = (typeof mockAgents)[number];
+
+const agentExportColumns: ExcelExportColumn<AgentExportRow>[] = [
+  { header: "Agent ID", value: (agent) => agent.agentId, width: 16 },
+  { header: "First name", value: (agent) => agent.firstName, width: 18 },
+  { header: "Last name", value: (agent) => agent.lastName, width: 18 },
+  { header: "Email", value: (agent) => agent.email, width: 30 },
+  { header: "Phone", value: (agent) => agent.phone, width: 18 },
+  { header: "Branch", value: (agent) => agent.branch.name, width: 20 },
+  { header: "Sales manager", value: (agent) => `${agent.sm.firstName} ${agent.sm.lastName}`, width: 22 },
+  { header: "Head of agency", value: (agent) => `${agent.hoa.firstName} ${agent.hoa.lastName}`, width: 22 },
+  { header: "Appointment date", value: (agent) => new Date(agent.appointmentDate), width: 16, numberFormat: "dd-mmm-yyyy" },
+  { header: "Active", value: (agent) => agent.isActive },
+  { header: "Monthly production", value: (agent) => agent.production.monthlyProduction, width: 20, numberFormat: '"KES" #,##0' },
+  { header: "Average ticket", value: (agent) => agent.production.averageTicketSize, width: 18, numberFormat: '"KES" #,##0' },
+  { header: "Productivity", value: (agent) => agent.production.productivity, width: 14, numberFormat: '0"%"' },
+  { header: "Training compliance", value: (agent) => agent.trainingCompliance, width: 20, numberFormat: '0"%"' },
+  { header: "Pending trainings", value: (agent) => agent.pendingTrainings, width: 18 },
+];
+
 function AgentsContent() {
   const [filters, setFilters] = useState({
     search: "",
@@ -102,10 +123,13 @@ function AgentsContent() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
+          <ExcelExportButton
+            columns={agentExportColumns}
+            rows={mockAgents}
+            fileName="agents"
+            sheetName="Agents"
+            title="Agent workforce"
+          />
           <Button>
             <UserPlus className="h-4 w-4 mr-2" />
             Add Agent

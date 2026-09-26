@@ -20,8 +20,7 @@ import {
   UserCheck
 } from "lucide-react";
 
-interface CandidateFiltersProps {
-  filters: {
+export interface CandidateFilterValues {
     search: string;
     status: string;
     stage: string;
@@ -29,8 +28,11 @@ interface CandidateFiltersProps {
     branch: string;
     assignedTo: string;
     dateRange: { start: string; end: string };
-  };
-  onFiltersChange: (filters: any) => void;
+}
+
+interface CandidateFiltersProps {
+  filters: CandidateFilterValues;
+  onFiltersChange: (filters: CandidateFilterValues) => void;
 }
 
 const statuses = [
@@ -73,7 +75,7 @@ const assignedTo = [
 ];
 
 export function CandidateFilters({ filters, onFiltersChange }: CandidateFiltersProps) {
-  const handleFilterChange = (key: string, value: any) => {
+  const handleFilterChange = (key: Exclude<keyof CandidateFilterValues, "dateRange">, value: string) => {
     onFiltersChange({
       ...filters,
       [key]: value,
@@ -258,7 +260,7 @@ export function CandidateFilters({ filters, onFiltersChange }: CandidateFiltersP
           <div className="flex items-center gap-2 flex-wrap">
             {filters.search && (
               <span className="px-2 py-1 bg-secondary rounded-md">
-                Search: "{filters.search}"
+                Search: &ldquo;{filters.search}&rdquo;
               </span>
             )}
             {filters.status && (

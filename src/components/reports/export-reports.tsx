@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNotificationStore } from "@/stores/notification.store";
+import { exportExcelWorkbook, type ExcelExportSheet } from "@/lib/export/excel";
 import { 
   Download, 
   FileText, 
@@ -29,15 +30,71 @@ const reportTypes = [
 ];
 
 const exportFormats = [
-  { value: "pdf", label: "PDF Report" },
   { value: "excel", label: "Excel Spreadsheet" },
-  { value: "csv", label: "CSV Data" },
-  { value: "powerpoint", label: "PowerPoint Presentation" },
 ];
 
-export function ExportReports() {
+interface ReportExportData {
+  performance: {
+    totalAgents: number;
+    activeAgents: number;
+    monthlyTarget: number;
+    monthlyAchievement: number;
+    achievementRate: number;
+    avgTicketSize: number;
+    conversionRate: number;
+    customerSatisfaction: number;
+  };
+  training: {
+    totalSessions: number;
+    completedSessions: number;
+    totalParticipants: number;
+    averageAttendance: number;
+    averageEffectiveness: number;
+    complianceRate: number;
+    categoriesBreakdown: Record<string, number>;
+  };
+  workforce: {
+    totalSalesManagers: number;
+    totalHOAs: number;
+    totalTrainers: number;
+    avgTeamSize: number;
+    topPerformers: Array<{ name: string; role: string; performance: number; region: string }>;
+  };
+  onboarding: {
+    totalCandidates: number;
+    activeCandidates: number;
+    approvedCandidates: number;
+    onboardedAgents: number;
+    conversionRate: number;
+    avgProcessingTime: number;
+    pipeline: Record<string, number>;
+  };
+}
+
+interface ExportReportsProps {
+  data: ReportExportData;
+}
+
+interface MetricRow {
+  metric: string;
+  value: string | number;
+}
+
+function createMetricSheet(name: string, title: string, rows: MetricRow[]): ExcelExportSheet {
+  return {
+    name,
+    title,
+    rows,
+    columns: [
+      { header: "Metric", value: (row) => (row as MetricRow).metric, width: 30 },
+      { header: "Value", value: (row) => (row as MetricRow).value, width: 28 },
+    ],
+  };
+}
+
+export function ExportReports({ data }: ExportReportsProps) {
   const [selectedReports, setSelectedReports] = useState<string[]>([]);
-  const [exportFormat, setExportFormat] = useState("");
+  const [exportFormat, setExportFormat] = useState("excel");
   const [isExporting, setIsExporting] = useState(false);
   const { addNotification } = useNotificationStore();
 
@@ -64,8 +121,65 @@ export function ExportReports() {
 
     setIsExporting(true);
     try {
-      // Simulate export process
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const sheets: ExcelExportSheet[] = [];
+
+      if (selectedReports.includes("performance")) {
+        sheets.push(createMetricSheet("Performance", "Performance analytics", [
+          { metric: "Total agents", value: data.performance.totalAgents },
+          { metric: "Active agents", value: data.performance.activeAgents },
+          { metric: "Monthly target (KES)", value: data.performance.monthlyTarget },
+          { metric: "Monthly achievement (KES)", value: data.performance.monthlyAchievement },
+          { metric: "Achievement rate (%)", value: data.performance.achievementRate },
+          { metric: "Average ticket size (KES)", value: data.performance.avgTicketSize },
+          { metric: "Conversion rate (%)", value: data.performance.conversionRate },
+          { metric: "Customer satisfaction", value: data.performance.customerSatisfaction },
+        ]));
+      }
+
+      if (selectedReports.includes("training")) {
+        sheets.push(createMetricSheet("Training", "Training analytics", [
+          { metric: "Total sessions", value: data.training.totalSessions },
+          { metric: "Completed sessions", value: data.training.completedSessions },
+          { metric: "Total participants", value: data.training.totalParticipants },
+          { metric: "Average attendance (%)", value: data.training.averageAttendance },
+          { metric: "Average effectiveness (%)", value: data.training.averageEffectiveness },
+          { metric: "Compliance rate (%)", value: data.training.complianceRate },
+          ...Object.entries(data.training.categoriesBreakdown).map(([category, count]) => ({
+            metric: `Category: ${category}`,
+            value: count,
+          })),
+        ]));
+      }
+
+      if (selectedReports.includes("workforce")) {
+        sheets.push(createMetricSheet("Workforce", "Workforce metrics", [
+          { metric: "Sales managers", value: data.workforce.totalSalesManagers },
+          { metric: "Heads of agency", value: data.workforce.totalHOAs },
+          { metric: "Trainers", value: data.workforce.totalTrainers },
+          { metric: "Average team size", value: data.workforce.avgTeamSize },
+          ...data.workforce.topPerformers.map((performer, index) => ({
+            metric: `Top performer ${index + 1}`,
+            value: `${performer.name}, ${performer.role}, ${performer.region} (${performer.performance}%)`,
+          })),
+        ]));
+      }
+
+      if (selectedReports.includes("onboarding")) {
+        sheets.push(createMetricSheet("Onboarding", "Onboarding statistics", [
+          { metric: "Total candidates", value: data.onboarding.totalCandidates },
+          { metric: "Active candidates", value: data.onboarding.activeCandidates },
+          { metric: "Approved candidates", value: data.onboarding.approvedCandidates },
+          { metric: "Onboarded agents", value: data.onboarding.onboardedAgents },
+          { metric: "Conversion rate (%)", value: data.onboarding.conversionRate },
+          { metric: "Average processing time (days)", value: data.onboarding.avgProcessingTime },
+          ...Object.entries(data.onboarding.pipeline).map(([stage, count]) => ({
+            metric: `Pipeline: ${stage}`,
+            value: count,
+          })),
+        ]));
+      }
+
+      await exportExcelWorkbook({ fileName: "learning-hub-reports", sheets });
       
       addNotification({
         id: Date.now().toString(),
@@ -78,8 +192,7 @@ export function ExportReports() {
 
       // Reset form
       setSelectedReports([]);
-      setExportFormat("");
-    } catch (error) {
+    } catch {
       addNotification({
         id: Date.now().toString(),
         title: "Export Failed",
@@ -189,7 +302,7 @@ export function ExportReports() {
             </Button>
             <Button 
               onClick={handleExport}
-              disabled={isExporting || selectedReports.length === 0 || !exportFormat}
+              disabled={isExporting || selectedReports.length === 0}
             >
               <Download className="h-4 w-4 mr-2" />
               {isExporting ? "Exporting..." : "Export Reports"}

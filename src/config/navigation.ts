@@ -1,4 +1,4 @@
-import { LucideIcon, Users, GraduationCap, BarChart3, Settings, Bell, Home, UserCheck, TrendingUp, FileText, Calendar } from "lucide-react";
+import { LucideIcon, Users, GraduationCap, BarChart3, Settings, Bell, Home, UserCheck, TrendingUp, Calendar } from "lucide-react";
 
 export interface NavItem {
   title: string;
@@ -82,7 +82,7 @@ export const navigation: NavGroup[] = [
       },
       {
         title: "My Trainings",
-        href: "/agents/trainings",
+        href: "/trainings",
         icon: GraduationCap,
         description: "Your training progress and schedule",
         roles: ["AGENT"]

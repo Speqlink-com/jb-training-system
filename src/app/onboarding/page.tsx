@@ -11,6 +11,8 @@ import { OnboardingPipeline } from "@/components/onboarding/onboarding-pipeline"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { ExcelExportButton } from "@/components/common/excel-export-button";
+import type { ExcelExportColumn } from "@/lib/export/excel";
 import { Permission } from "@/config/permissions";
 import { 
   Users, 
@@ -19,7 +21,6 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Download,
   FileText,
   Calendar,
   TrendingUp
@@ -316,6 +317,26 @@ const mockCandidates = [
   }
 ];
 
+type CandidateExportRow = (typeof mockCandidates)[number];
+
+const candidateExportColumns: ExcelExportColumn<CandidateExportRow>[] = [
+  { header: "First name", value: (candidate) => candidate.firstName, width: 18 },
+  { header: "Last name", value: (candidate) => candidate.lastName, width: 18 },
+  { header: "Email", value: (candidate) => candidate.email, width: 30 },
+  { header: "Phone", value: (candidate) => candidate.phone, width: 18 },
+  { header: "ID number", value: (candidate) => candidate.idNumber, width: 16 },
+  { header: "Application date", value: (candidate) => new Date(candidate.applicationDate), width: 18, numberFormat: "dd-mmm-yyyy" },
+  { header: "Status", value: (candidate) => candidate.status, width: 18 },
+  { header: "Stage", value: (candidate) => candidate.stage, width: 24 },
+  { header: "Assigned to", value: (candidate) => candidate.assignedTo.name, width: 22 },
+  { header: "Branch", value: (candidate) => candidate.branch.name, width: 20 },
+  { header: "Region", value: (candidate) => candidate.region, width: 16 },
+  { header: "Education", value: (candidate) => candidate.education, width: 24 },
+  { header: "Experience", value: (candidate) => candidate.experience, width: 24 },
+  { header: "Expected start", value: (candidate) => candidate.expectedStartDate ? new Date(candidate.expectedStartDate) : null, width: 18, numberFormat: "dd-mmm-yyyy" },
+  { header: "Next action", value: (candidate) => candidate.nextAction, width: 28 },
+];
+
 function OnboardingContent() {
   const [filters, setFilters] = useState({
     search: "",
@@ -344,10 +365,14 @@ function OnboardingContent() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export Pipeline
-          </Button>
+          <ExcelExportButton
+            columns={candidateExportColumns}
+            rows={mockCandidates}
+            fileName="onboarding-pipeline"
+            sheetName="Onboarding pipeline"
+            title="Onboarding pipeline"
+            label="Export to Excel"
+          />
           <Button onClick={() => setShowAddDialog(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Add Candidate

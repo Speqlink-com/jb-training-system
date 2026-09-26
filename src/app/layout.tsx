@@ -3,8 +3,8 @@ import { AuthProvider } from "@/lib/auth/auth-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Training Management Platform",
-  description: "Enterprise training and workforce management system",
+  title: "Jubilee Learning Hub",
+  description: "Training, performance, and compliance operations workspace",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

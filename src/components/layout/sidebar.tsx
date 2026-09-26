@@ -2,129 +2,105 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { ChevronDown, ChevronRight, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getNavigationForRole } from "@/config/navigation";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface SidebarProps {
   className?: string;
 }
 
 export function Sidebar({ className }: SidebarProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const pathname = usePathname();
   const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
 
   if (!user) return null;
 
   const navigation = getNavigationForRole(user.role);
+  const isActiveLink = (href: string) =>
+    href === "/dashboard" ? pathname === href : pathname.startsWith(href);
 
   const toggleGroup = (groupTitle: string) => {
-    setExpandedGroups(prev =>
-      prev.includes(groupTitle)
-        ? prev.filter(title => title !== groupTitle)
-        : [...prev, groupTitle]
+    setExpandedGroups((current) =>
+      current.includes(groupTitle)
+        ? current.filter((title) => title !== groupTitle)
+        : [...current, groupTitle],
     );
   };
 
-  const isGroupExpanded = (groupTitle: string) => {
-    return expandedGroups.includes(groupTitle);
-  };
-
-  const isActiveLink = (href: string) => {
-    if (href === "/dashboard") {
-      return pathname === "/dashboard";
-    }
-    return pathname.startsWith(href);
-  };
-
   return (
-    <div className={cn("flex h-full w-64 flex-col border-r border-slate-700 bg-[image:var(--sidebar-gradient)] text-slate-200", className)}>
-      {/* Logo/Brand */}
+    <div className={cn("flex h-full w-64 flex-col bg-[#641329] text-white", className)}>
       <div className="flex h-[4.5rem] items-center border-b border-white/10 px-5">
-        <Link href="/dashboard" className="flex items-center space-x-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-button-gradient shadow-lg shadow-rose-950/30">
-            <span className="text-white font-bold text-sm">TMP</span>
-          </div>
-          <div><span className="block text-sm font-semibold tracking-tight text-white">Jubilee</span><span className="block text-[10px] font-medium uppercase tracking-[.16em] text-slate-400">Learning hub</span></div>
+        <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
+          <span className="grid h-10 w-16 shrink-0 place-items-center rounded-lg bg-white px-1.5 shadow-sm">
+            <Image src="/jubilee-logo.png" alt="Jubilee Insurance" width={64} height={64} className="h-auto w-full" />
+          </span>
+          <span className="min-w-0">
+            <span className="block truncate text-sm font-semibold tracking-tight">Jubilee Learning</span>
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">Operations hub</span>
+          </span>
         </Link>
       </div>
 
-      {/* Navigation */}
-      <ScrollArea className="flex-1 px-3 py-4">
-        <nav className="space-y-5">
+      <ScrollArea className="flex-1 px-3 py-5">
+        <nav className="space-y-6" aria-label="Primary navigation">
           {navigation.map((group) => (
             <div key={group.title}>
-              {/* Group Header */}
-              <div className="px-3 py-1">
-                <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-semibold uppercase tracking-[.14em] text-slate-500">
-                    {group.title}
-                  </p>
-                  {group.items.some(item => item.children) && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-5 w-5 p-0 text-slate-500 hover:bg-white/10 hover:text-white"
-                      onClick={() => toggleGroup(group.title)}
-                    >
-                      {isGroupExpanded(group.title) ? (
-                        <ChevronDown className="h-3 w-3" />
-                      ) : (
-                        <ChevronRight className="h-3 w-3" />
-                      )}
-                    </Button>
-                  )}
-                </div>
+              <div className="mb-1 flex items-center justify-between px-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-white/35">
+                  {group.title}
+                </p>
+                {group.items.some((item) => item.children) && (
+                  <button
+                    type="button"
+                    className="grid h-6 w-6 place-items-center rounded-md text-white/40 hover:bg-white/10 hover:text-white"
+                    onClick={() => toggleGroup(group.title)}
+                    aria-label={`Toggle ${group.title}`}
+                  >
+                    {expandedGroups.includes(group.title) ? (
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    ) : (
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    )}
+                  </button>
+                )}
               </div>
 
-              {/* Group Items */}
               <div className="space-y-1">
                 {group.items.map((item) => (
                   <div key={item.href}>
-                    {/* Main Item */}
                     <Link
                       href={item.href}
                       className={cn(
-                        "group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                         isActiveLink(item.href)
-                          ? "bg-white/12 text-white shadow-sm ring-1 ring-white/10"
-                          : "text-slate-300 hover:bg-white/6 hover:text-white"
+                          ? "bg-[#f7ecef] text-[#641329] shadow-sm"
+                          : "text-white/68 hover:bg-white/10 hover:text-white",
                       )}
                     >
-                      <item.icon className={cn(
-                        "mr-3 h-4 w-4 transition-colors",
-                        isActiveLink(item.href) 
-                          ? "text-white" 
-                          : "text-slate-500 group-hover:text-rose-300"
-                      )} />
-                      {item.title}
+                      <item.icon className="h-4 w-4 shrink-0" />
+                      <span className="truncate">{item.title}</span>
                     </Link>
 
-                    {/* Child Items */}
-                    {item.children && isGroupExpanded(group.title) && (
-                      <div className="ml-7 space-y-1 border-l border-white/10 pl-3">
+                    {item.children && expandedGroups.includes(group.title) && (
+                      <div className="ml-5 mt-1 space-y-1 border-l border-white/15 pl-3">
                         {item.children.map((child) => (
                           <Link
                             key={child.href}
                             href={child.href}
                             className={cn(
-                              "group flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-200 hover:bg-white/6 hover:text-white",
+                              "flex items-center gap-2 rounded-md px-3 py-2 text-xs transition-colors",
                               isActiveLink(child.href)
-                                ? "bg-white/10 text-white font-medium"
-                                : "text-slate-400"
+                                ? "bg-white/12 text-white"
+                                : "text-white/55 hover:bg-white/8 hover:text-white",
                             )}
                           >
-                            <child.icon className={cn(
-                              "mr-3 h-3 w-3 transition-colors",
-                              isActiveLink(child.href)
-                                ? "text-rose-300"
-                                : "text-slate-600 group-hover:text-rose-300"
-                            )} />
+                            <child.icon className="h-3.5 w-3.5" />
                             {child.title}
                           </Link>
                         ))}
@@ -138,23 +114,26 @@ export function Sidebar({ className }: SidebarProps) {
         </nav>
       </ScrollArea>
 
-      {/* User Profile Section */}
       <div className="border-t border-white/10 p-4">
-        <div className="flex items-center space-x-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-button-gradient shadow-md">
-            <span className="text-white text-sm font-medium">
-              {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="truncate text-sm font-medium text-white">
-              {user.firstName} {user.lastName}
-            </p>
-            <p className="truncate text-[11px] font-medium uppercase tracking-wide text-slate-400">
-              {user.role.replace('_', ' ')}
+        <div className="mb-3 flex items-center gap-3 px-1">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#f7ecef] text-xs font-bold text-[#641329]">
+            {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold">{user.firstName} {user.lastName}</p>
+            <p className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">
+              {user.role.replaceAll("_", " ")}
             </p>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={() => void logout()}
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 px-3 py-2.5 text-xs font-semibold text-white/70 transition hover:bg-white/10 hover:text-white"
+        >
+          <LogOut className="h-3.5 w-3.5" />
+          Sign out
+        </button>
       </div>
     </div>
   );

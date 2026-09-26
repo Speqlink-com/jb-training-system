@@ -1,9 +1,9 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/utils";
 import { 
   Clock, 
@@ -35,7 +35,7 @@ interface CandidateTimelineProps {
   }>;
 }
 
-export function CandidateTimeline({ candidateId, timeline, notes }: CandidateTimelineProps) {
+export function CandidateTimeline({ candidateId: _candidateId, timeline, notes }: CandidateTimelineProps) {
   const getTimelineIcon = (type: string) => {
     switch (type) {
       case "APPLICATION":
@@ -72,10 +72,10 @@ export function CandidateTimeline({ candidateId, timeline, notes }: CandidateTim
 
   // Combine timeline and notes, sort by timestamp
   const combinedEvents = [
-    ...timeline.map(item => ({ ...item, eventType: "timeline" })),
+    ...timeline.map(item => ({ ...item, eventType: "timeline" as const, authorRole: undefined })),
     ...notes.map(item => ({ 
       ...item, 
-      eventType: "note",
+      eventType: "note" as const,
       action: "Note added",
       description: item.content,
       user: item.author,
@@ -115,7 +115,7 @@ export function CandidateTimeline({ candidateId, timeline, notes }: CandidateTim
                     <div className="flex items-center gap-2">
                       {event.eventType === "note" && (
                         <Badge variant="outline" className="text-xs">
-                          {(event as any).authorRole || "Note"}
+                          {event.authorRole || "Note"}
                         </Badge>
                       )}
                       <span className="text-sm text-muted-foreground">

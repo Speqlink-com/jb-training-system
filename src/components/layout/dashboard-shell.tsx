@@ -15,11 +15,11 @@ export function DashboardShell({ children, className }: DashboardShellProps) {
   const { sidebarOpen, mobileSidebarOpen } = useUIStore();
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-dvh bg-[#f8f9fa]">
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "hidden md:flex flex-col transition-all duration-300 ease-in-out",
+          "hidden shrink-0 flex-col transition-all duration-300 ease-in-out md:flex",
           sidebarOpen ? "w-64" : "w-0 overflow-hidden"
         )}
       >
@@ -30,11 +30,11 @@ export function DashboardShell({ children, className }: DashboardShellProps) {
       <MobileNavigation isOpen={mobileSidebarOpen} />
 
       {/* Main Content */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header />
         
         {/* Content Area */}
-        <main className={cn("flex-1 overflow-y-auto", className)}>
+        <main className={cn("flex-1 overflow-y-auto bg-[#f8f9fa]", className)}>
           {children}
         </main>
       </div>

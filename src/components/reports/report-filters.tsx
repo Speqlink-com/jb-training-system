@@ -20,14 +20,16 @@ import {
   RefreshCw
 } from "lucide-react";
 
-interface ReportFiltersProps {
-  filters: {
+export interface ReportFilterValues {
     dateRange: { start: string; end: string };
     region: string;
     branch: string;
     reportType: string;
-  };
-  onFiltersChange: (filters: any) => void;
+}
+
+interface ReportFiltersProps {
+  filters: ReportFilterValues;
+  onFiltersChange: (filters: ReportFilterValues) => void;
 }
 
 const regions = [
@@ -64,7 +66,7 @@ const quickRanges = [
 ];
 
 export function ReportFilters({ filters, onFiltersChange }: ReportFiltersProps) {
-  const handleFilterChange = (key: string, value: any) => {
+  const handleFilterChange = (key: Exclude<keyof ReportFilterValues, "dateRange">, value: string) => {
     onFiltersChange({
       ...filters,
       [key]: value,

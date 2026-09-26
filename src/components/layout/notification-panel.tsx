@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { 
+import {
   X, 
-  Check, 
   CheckCheck, 
   Bell, 
   GraduationCap, 
@@ -61,8 +60,26 @@ export function NotificationPanel() {
     notificationPanelOpen, 
     setNotificationPanelOpen, 
     unreadCount,
-    setUnreadCount 
+    setUnreadCount,
+    notifications,
   } = useNotificationStore();
+
+  const visibleNotifications = [
+    ...notifications.map((notification) => ({
+      ...notification,
+      time: new Date(notification.timestamp).toLocaleString(),
+      read: notification.read ?? false,
+      icon:
+        notification.type === "success"
+          ? Users
+          : notification.type === "warning" || notification.type === "error"
+            ? AlertTriangle
+            : notification.type === "reminder"
+              ? GraduationCap
+              : Info,
+    })),
+    ...mockNotifications,
+  ];
 
   const markAllAsRead = () => {
     setUnreadCount(0);
@@ -131,8 +148,8 @@ export function NotificationPanel() {
         {/* Notifications List */}
         <ScrollArea className="h-full pb-20">
           <div className="p-4 space-y-4">
-            {mockNotifications.length > 0 ? (
-              mockNotifications.map((notification) => (
+            {visibleNotifications.length > 0 ? (
+              visibleNotifications.map((notification) => (
                 <div
                   key={notification.id}
                   className={cn(

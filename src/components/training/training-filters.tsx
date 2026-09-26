@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,24 +8,31 @@ import { Badge } from "@/components/ui/badge";
 import { TRAINING_CATEGORIES } from "@/config/constants";
 import { Search, Filter, X } from "lucide-react";
 
-interface TrainingFiltersProps {
-  onFiltersChange: (filters: any) => void;
+export interface TrainingFilterValues {
+  search: string;
+  category: string;
+  trainer: string;
+  branch: string;
+  status: string;
+  dateRange: { start: string; end: string };
 }
 
-export function TrainingFilters({ onFiltersChange }: TrainingFiltersProps) {
-  const [filters, setFilters] = useState({
-    search: "",
-    category: "",
-    trainer: "",
-    branch: "",
-    status: "",
-    dateRange: ""
-  });
+interface TrainingFiltersProps {
+  filters: TrainingFilterValues;
+  onFiltersChange: (filters: TrainingFilterValues) => void;
+}
 
-  const handleFilterChange = (key: string, value: string) => {
+export function TrainingFilters({ filters, onFiltersChange }: TrainingFiltersProps) {
+  const handleFilterChange = (key: Exclude<keyof TrainingFilterValues, "dateRange">, value: string) => {
     const newFilters = { ...filters, [key]: value };
-    setFilters(newFilters);
     onFiltersChange(newFilters);
+  };
+
+  const handleDateRangeChange = (key: "start" | "end", value: string) => {
+    onFiltersChange({
+      ...filters,
+      dateRange: { ...filters.dateRange, [key]: value },
+    });
   };
 
   const clearFilters = () => {
@@ -36,14 +42,22 @@ export function TrainingFilters({ onFiltersChange }: TrainingFiltersProps) {
       trainer: "",
       branch: "",
       status: "",
-      dateRange: ""
+      dateRange: { start: "", end: "" },
     };
-    setFilters(clearedFilters);
     onFiltersChange(clearedFilters);
   };
 
-  const hasActiveFilters = Object.values(filters).some(value => value !== "");
-  const activeFilterCount = Object.values(filters).filter(value => value !== "").length;
+  const flatFilterValues = [
+    filters.search,
+    filters.category,
+    filters.trainer,
+    filters.branch,
+    filters.status,
+    filters.dateRange.start,
+    filters.dateRange.end,
+  ];
+  const activeFilterCount = flatFilterValues.filter(Boolean).length;
+  const hasActiveFilters = activeFilterCount > 0;
 
   return (
     <Card>
@@ -74,7 +88,7 @@ export function TrainingFilters({ onFiltersChange }: TrainingFiltersProps) {
           </div>
 
           {/* Filter Controls */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -145,20 +159,18 @@ export function TrainingFilters({ onFiltersChange }: TrainingFiltersProps) {
               </SelectContent>
             </Select>
 
-            {/* Date Range Filter */}
-            <Select value={filters.dateRange} onValueChange={(value) => handleFilterChange("dateRange", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Date range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All dates</SelectItem>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="this-week">This Week</SelectItem>
-                <SelectItem value="this-month">This Month</SelectItem>
-                <SelectItem value="last-month">Last Month</SelectItem>
-                <SelectItem value="last-3-months">Last 3 Months</SelectItem>
-              </SelectContent>
-            </Select>
+            <Input
+              type="date"
+              aria-label="Training start date"
+              value={filters.dateRange.start}
+              onChange={(event) => handleDateRangeChange("start", event.target.value)}
+            />
+            <Input
+              type="date"
+              aria-label="Training end date"
+              value={filters.dateRange.end}
+              onChange={(event) => handleDateRangeChange("end", event.target.value)}
+            />
           </div>
         </div>
       </CardContent>

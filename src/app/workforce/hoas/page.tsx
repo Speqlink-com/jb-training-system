@@ -10,6 +10,8 @@ import { CreateHOADialog } from "@/components/workforce/create-hoa-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { ExcelExportButton } from "@/components/common/excel-export-button";
+import type { ExcelExportColumn } from "@/lib/export/excel";
 import { Permission } from "@/config/permissions";
 import { 
   Users, 
@@ -18,7 +20,6 @@ import {
   Target,
   TrendingUp,
   Award,
-  Download,
   Crown,
   Building2,
   MapPin
@@ -140,6 +141,27 @@ const mockHOAs = [
   }
 ];
 
+type HoaExportRow = (typeof mockHOAs)[number];
+
+const hoaExportColumns: ExcelExportColumn<HoaExportRow>[] = [
+  { header: "Employee ID", value: (hoa) => hoa.employeeId, width: 16 },
+  { header: "First name", value: (hoa) => hoa.firstName, width: 18 },
+  { header: "Last name", value: (hoa) => hoa.lastName, width: 18 },
+  { header: "Email", value: (hoa) => hoa.email, width: 30 },
+  { header: "Phone", value: (hoa) => hoa.phone, width: 18 },
+  { header: "Region", value: (hoa) => hoa.region, width: 16 },
+  { header: "Branches", value: (hoa) => hoa.branches.map((branch) => branch.name).join(", "), width: 34 },
+  { header: "Date joined", value: (hoa) => new Date(hoa.dateJoined), width: 16, numberFormat: "dd-mmm-yyyy" },
+  { header: "Status", value: (hoa) => hoa.status, width: 14 },
+  { header: "Sales managers", value: (hoa) => hoa.salesManagersCount, width: 18 },
+  { header: "Team size", value: (hoa) => hoa.totalTeamSize, width: 14 },
+  { header: "Active agents", value: (hoa) => hoa.activeAgents, width: 16 },
+  { header: "Monthly target", value: (hoa) => hoa.monthlyTarget, width: 18, numberFormat: '"KES" #,##0' },
+  { header: "Monthly achievement", value: (hoa) => hoa.monthlyAchievement, width: 22, numberFormat: '"KES" #,##0' },
+  { header: "Achievement rate", value: (hoa) => hoa.achievementRate, width: 18, numberFormat: '0"%"' },
+  { header: "Training compliance", value: (hoa) => hoa.trainingCompliance, width: 20, numberFormat: '0"%"' },
+];
+
 function HOAsContent() {
   const [filters, setFilters] = useState({
     search: "",
@@ -168,10 +190,13 @@ function HOAsContent() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export Data
-          </Button>
+          <ExcelExportButton
+            columns={hoaExportColumns}
+            rows={mockHOAs}
+            fileName="heads-of-agency"
+            sheetName="Heads of agency"
+            title="Head of agency performance"
+          />
           <Button onClick={() => setShowCreateDialog(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Add HOA

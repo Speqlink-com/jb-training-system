@@ -1,279 +1,128 @@
 "use client";
 
-import { useState } from "react";
-import { ProtectedRoute } from "@/lib/auth/protected-route";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import QRCode from "qrcode";
+import { CalendarDays, CheckCircle2, Clock3, GraduationCap, MapPin, Plus, QrCode, ScanLine, Users } from "lucide-react";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { NotificationPanel } from "@/components/layout/notification-panel";
-import { TrainingsTable } from "@/components/training/trainings-table";
-import { TrainingFilters } from "@/components/training/training-filters";
-import { CreateTrainingDialog } from "@/components/training/create-training-dialog";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ExcelExportButton } from "@/components/common/excel-export-button";
+import { ProtectedRoute } from "@/lib/auth/protected-route";
+import { Permission, Role } from "@/config/permissions";
+import { useAuth } from "@/lib/auth/auth-context";
+import type { ExcelExportColumn } from "@/lib/export/excel";
+import {
+  attendanceForTraining,
+  canAttend,
+  getCheckInPath,
+  getTrainers,
+  getTrainings,
+  PLATFORM_CHANGE_EVENT,
+  saveTrainings,
+  trainerName,
+  type LocalTrainer,
+  type LocalTraining,
+} from "@/lib/local-platform";
 import { Button } from "@/components/ui/button";
-import { StatCard } from "@/components/dashboard/stat-card";
-import { Permission } from "@/config/permissions";
-import { TRAINING_CATEGORIES } from "@/config/constants";
-import { 
-  GraduationCap, 
-  Plus, 
-  Calendar,
-  Users,
-  CheckCircle,
-  Clock,
-  AlertTriangle,
-  TrendingUp,
-  Download
-} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-// Mock training data - replace with API calls
-const mockTrainings = [
-  {
-    id: "1",
-    title: "AML & Compliance Training",
-    description: "Anti-Money Laundering and compliance regulations for financial services",
-    category: "SPECIALISED" as keyof typeof TRAINING_CATEGORIES,
-    subCategory: "AML",
-    trainer: {
-      id: "1",
-      firstName: "John",
-      lastName: "Mwangi",
-      email: "john.mwangi@company.com"
-    },
-    scheduledDate: "2024-08-28T10:00:00Z",
-    duration: 4,
-    location: "Nairobi CBD Training Center",
-    branchId: "1",
-    branch: { id: "1", name: "Nairobi CBD", code: "NCB" },
-    expectedManpower: 120,
-    actualAttendance: 104,
-    attendanceRate: 87,
-    productivity: 91,
-    averageTicketSize: 143000,
-    status: "COMPLETED" as const,
-    createdAt: "2024-08-01T00:00:00Z",
-    updatedAt: "2024-08-28T15:00:00Z",
-  },
-  {
-    id: "2",
-    title: "Product Mix Training",
-    description: "Comprehensive training on insurance product portfolio and sales techniques",
-    category: "EXISTING_TARGETED" as keyof typeof TRAINING_CATEGORIES,
-    subCategory: null,
-    trainer: {
-      id: "2",
-      firstName: "Sarah",
-      lastName: "Wanjiku", 
-      email: "sarah.wanjiku@company.com"
-    },
-    scheduledDate: "2024-09-05T09:00:00Z",
-    duration: 6,
-    location: "Westlands Branch",
-    branchId: "2",
-    branch: { id: "2", name: "Westlands", code: "WLD" },
-    expectedManpower: 85,
-    actualAttendance: null,
-    attendanceRate: null,
-    productivity: null,
-    averageTicketSize: null,
-    status: "SCHEDULED" as const,
-    createdAt: "2024-08-10T00:00:00Z",
-    updatedAt: "2024-08-20T00:00:00Z",
-  },
-  {
-    id: "3",
-    title: "New Agent Induction",
-    description: "Orientation and basic training program for newly appointed agents",
-    category: "NEW_AGENTS" as keyof typeof TRAINING_CATEGORIES,
-    subCategory: null,
-    trainer: {
-      id: "3",
-      firstName: "Peter",
-      lastName: "Kimani",
-      email: "peter.kimani@company.com"
-    },
-    scheduledDate: "2024-09-10T08:00:00Z",
-    duration: 8,
-    location: "Head Office Training Facility",
-    branchId: null,
-    branch: null,
-    expectedManpower: 45,
-    actualAttendance: null,
-    attendanceRate: null,
-    productivity: null,
-    averageTicketSize: null,
-    status: "SCHEDULED" as const,
-    createdAt: "2024-08-15T00:00:00Z",
-    updatedAt: "2024-08-25T00:00:00Z",
-  },
-  {
-    id: "4",
-    title: "Digital Transformation Workshop",
-    description: "Training on digital sales platforms and customer engagement tools",
-    category: "ALTERNATIVE_DISTRIBUTION" as keyof typeof TRAINING_CATEGORIES,
-    subCategory: "Digital",
-    trainer: {
-      id: "4",
-      firstName: "Grace",
-      lastName: "Akinyi",
-      email: "grace.akinyi@company.com"
-    },
-    scheduledDate: "2024-08-20T13:00:00Z",
-    duration: 5,
-    location: "Virtual (Zoom)",
-    branchId: null,
-    branch: null,
-    expectedManpower: 200,
-    actualAttendance: 185,
-    attendanceRate: 93,
-    productivity: 88,
-    averageTicketSize: 165000,
-    status: "COMPLETED" as const,
-    createdAt: "2024-07-25T00:00:00Z",
-    updatedAt: "2024-08-20T18:00:00Z",
-  },
+type TrainingExportRow = LocalTraining & { trainer: string; attendance: number };
+const columns: ExcelExportColumn<TrainingExportRow>[] = [
+  { header: "Programme", value: (row) => row.title, width: 34 },
+  { header: "Trainer", value: (row) => row.trainer, width: 24 },
+  { header: "Scheduled", value: (row) => new Date(row.scheduledAt), width: 20, numberFormat: "dd-mmm-yyyy hh:mm" },
+  { header: "Location", value: (row) => row.location, width: 34 },
+  { header: "Audience", value: (row) => row.audienceRoles.join(", "), width: 32 },
+  { header: "Capacity", value: (row) => row.capacity, width: 13 },
+  { header: "Attendance", value: (row) => row.attendance, width: 15 },
+  { header: "Status", value: (row) => row.status, width: 16 },
 ];
 
-function TrainingsContent() {
-  const [filters, setFilters] = useState({
-    search: "",
-    category: "",
-    trainer: "",
-    branch: "",
-    status: "",
-    dateRange: { start: "", end: "" },
-  });
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
+function TrainingsWorkspace() {
+  const { user } = useAuth();
+  const [trainings, setTrainings] = useState<LocalTraining[]>([]);
+  const [trainers, setTrainers] = useState<LocalTrainer[]>([]);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [qrTraining, setQrTraining] = useState<LocalTraining | null>(null);
 
-  const totalTrainings = mockTrainings.length;
-  const scheduledTrainings = mockTrainings.filter(t => t.status === "SCHEDULED").length;
-  const completedTrainings = mockTrainings.filter(t => t.status === "COMPLETED").length;
-  const averageAttendance = Math.round(
-    mockTrainings
-      .filter(t => t.attendanceRate !== null)
-      .reduce((sum, t) => sum + (t.attendanceRate || 0), 0) / 
-    mockTrainings.filter(t => t.attendanceRate !== null).length
-  );
+  const refresh = () => { setTrainings(getTrainings()); setTrainers(getTrainers()); };
+  useEffect(() => {
+    const timer = window.setTimeout(refresh, 0);
+    window.addEventListener(PLATFORM_CHANGE_EVENT, refresh);
+    window.addEventListener("storage", refresh);
+    return () => { window.clearTimeout(timer); window.removeEventListener(PLATFORM_CHANGE_EVENT, refresh); window.removeEventListener("storage", refresh); };
+  }, []);
 
-  return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Training Programs</h1>
-          <p className="text-muted-foreground">
-            Manage training sessions, track attendance, and monitor effectiveness
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export Reports
-          </Button>
-          <Button onClick={() => setShowCreateDialog(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Schedule Training
-          </Button>
-        </div>
-      </div>
+  const rows = useMemo<TrainingExportRow[]>(() => trainings.map((training) => ({
+    ...training,
+    trainer: trainerName(training.trainerId, trainers),
+    attendance: attendanceForTraining(training.id).length,
+  })), [trainings, trainers]);
+  const canManage = user?.role === Role.ADMIN || user?.role === Role.TRAINER;
+  const relevant = user && !canManage ? trainings.filter((training) => canAttend(training, user)) : trainings;
+  const attendeeTotal = rows.reduce((sum, row) => sum + row.attendance, 0);
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Total Programs"
-          value={totalTrainings.toString()}
-          description="All training programs"
-          icon={GraduationCap}
-          trend={{ value: 12, isPositive: true }}
-        />
-        <StatCard
-          title="Scheduled"
-          value={scheduledTrainings.toString()}
-          description="Upcoming sessions"
-          icon={Calendar}
-        />
-        <StatCard
-          title="Completed"
-          value={completedTrainings.toString()}
-          description="Finished sessions"
-          icon={CheckCircle}
-          trend={{ value: 8, isPositive: true }}
-        />
-        <StatCard
-          title="Avg Attendance"
-          value={`${averageAttendance}%`}
-          description="Attendance rate"
-          icon={Users}
-          trend={{ value: 3, isPositive: true }}
-        />
-      </div>
+  return <div className="mx-auto max-w-[1440px] space-y-7 px-5 py-7 sm:px-8 lg:px-12 lg:py-10">
+    <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.19em] text-[#9b1b36]">Learning operations</p><h1 className="mt-2 text-4xl font-bold tracking-[-0.045em] text-[#171d25]">Training programmes</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">Schedule learning, issue a secure programme QR, and capture named attendance from signed-in participants.</p></div><div className="flex flex-wrap gap-2">{canManage && <><ExcelExportButton columns={columns} rows={rows} fileName="jubilee-training-programmes" sheetName="Programmes" title="Jubilee training programmes" /><Button asChild variant="outline"><Link href="/trainings/attendance"><Users className="mr-2 h-4 w-4" />Attendance console</Link></Button><Button onClick={() => setCreateOpen(true)} className="bg-[#9b1b36] hover:bg-[#7b172e]"><Plus className="mr-2 h-4 w-4" />New programme</Button></>}</div></header>
 
-      {/* Training Categories Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Training Categories</CardTitle>
-          <CardDescription>
-            Overview of training programs by category
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(TRAINING_CATEGORIES).map(([key, value]) => {
-              const categoryTrainings = mockTrainings.filter(t => t.category === key);
-              return (
-                <div key={key} className="p-4 border rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium">{value}</h4>
-                    <span className="text-2xl font-bold text-primary">
-                      {categoryTrainings.length}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {categoryTrainings.filter(t => t.status === "SCHEDULED").length} upcoming
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+    <section className="grid gap-4 sm:grid-cols-3">{[
+      { label: "Programmes", value: relevant.length, icon: GraduationCap },
+      { label: "Open for check-in", value: relevant.filter((item) => item.status !== "COMPLETED").length, icon: ScanLine },
+      { label: "Recorded attendance", value: attendeeTotal, icon: CheckCircle2 },
+    ].map(({ label, value, icon: Icon }) => <Card key={label} className="border-[#dce1e3] shadow-none"><CardContent className="flex items-center justify-between p-5"><div><p className="text-sm text-slate-500">{label}</p><p className="mt-1 text-3xl font-bold text-slate-900">{value}</p></div><span className="grid h-11 w-11 place-items-center rounded-xl bg-[#f7ecef] text-[#9b1b36]"><Icon className="h-5 w-5" /></span></CardContent></Card>)}</section>
 
-      {/* Trainings Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Training Programs</CardTitle>
-          <CardDescription>
-            Complete list of training sessions with status and attendance
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <TrainingFilters 
-            filters={filters}
-            onFiltersChange={setFilters}
-          />
-          <TrainingsTable 
-            trainings={mockTrainings}
-            filters={filters}
-          />
-        </CardContent>
-      </Card>
+    <section className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+      {relevant.map((training) => {
+        const present = attendanceForTraining(training.id).length;
+        const eligible = user ? canAttend(training, user) : false;
+        return <article key={training.id} className="flex min-h-[310px] flex-col rounded-xl border border-[#dce1e3] bg-white p-6 shadow-[0_1px_2px_rgba(20,30,34,0.025)]"><div className="flex items-start justify-between gap-4"><Badge className={training.status === "IN_PROGRESS" ? "bg-amber-50 text-amber-700 hover:bg-amber-50" : "bg-[#f7ecef] text-[#7b172e] hover:bg-[#f7ecef]"}>{training.status.replaceAll("_", " ")}</Badge><span className="text-xs font-semibold text-slate-400">{present}/{training.capacity}</span></div><h2 className="mt-5 text-xl font-semibold tracking-tight text-slate-900">{training.title}</h2><p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">{training.description}</p><div className="mt-5 space-y-2.5 text-sm text-slate-600"><p className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-[#9b1b36]" />{new Date(training.scheduledAt).toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short" })}</p><p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-[#9b1b36]" />{training.location}</p><p className="flex items-center gap-2"><Clock3 className="h-4 w-4 text-[#9b1b36]" />{training.durationHours} hours · {trainerName(training.trainerId, trainers)}</p></div><div className="mt-auto flex gap-2 pt-6">{canManage ? <Button className="flex-1 bg-[#641329] hover:bg-[#4e0f20]" onClick={() => setQrTraining(training)}><QrCode className="mr-2 h-4 w-4" />Open QR</Button> : eligible ? <Button asChild className="flex-1 bg-[#9b1b36] hover:bg-[#7b172e]"><Link href={getCheckInPath(training.id)}><ScanLine className="mr-2 h-4 w-4" />Check in</Link></Button> : <Button className="flex-1" disabled>Not assigned</Button>}</div></article>;
+      })}
+    </section>
+    {relevant.length === 0 && <div className="rounded-xl border border-dashed border-slate-300 bg-white py-16 text-center"><GraduationCap className="mx-auto h-8 w-8 text-slate-300" /><p className="mt-3 font-medium text-slate-700">No programmes are assigned to your role.</p></div>}
 
-      {/* Create Training Dialog */}
-      <CreateTrainingDialog
-        open={showCreateDialog}
-        onOpenChange={setShowCreateDialog}
-      />
-    </div>
-  );
+    <CreateTrainingDialog open={createOpen} onOpenChange={setCreateOpen} trainers={trainers.filter((trainer) => trainer.status === "ACTIVE")} trainings={trainings} />
+    <TrainingQrDialog training={qrTraining} open={Boolean(qrTraining)} onOpenChange={(open) => !open && setQrTraining(null)} />
+  </div>;
 }
 
-export default function TrainingsPage() {
-  return (
-    <ProtectedRoute 
-      requiredPermissions={[Permission.TRAININGS_READ]}
-    >
-      <DashboardShell>
-        <TrainingsContent />
-        <NotificationPanel />
-      </DashboardShell>
-    </ProtectedRoute>
-  );
+function QrCanvas({ value }: { value: string }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => { if (ref.current) void QRCode.toCanvas(ref.current, value, { width: 280, margin: 2, color: { dark: "#171d25", light: "#ffffff" } }); }, [value]);
+  return <canvas ref={ref} className="h-auto max-w-full rounded-lg" aria-label="Training attendance QR code" />;
 }
+
+function TrainingQrDialog({ training, open, onOpenChange }: { training: LocalTraining | null; open: boolean; onOpenChange: (open: boolean) => void }) {
+  const url = training && typeof window !== "undefined" ? `${window.location.origin}${getCheckInPath(training.id)}` : "";
+  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="sm:max-w-md"><DialogHeader><DialogTitle>Attendance QR</DialogTitle><DialogDescription>{training?.title}. Participants must sign in before attendance is recorded.</DialogDescription></DialogHeader>{training && url && <div className="flex flex-col items-center"><div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><QrCanvas value={url} /></div><p className="mt-4 break-all rounded-lg bg-slate-50 p-3 text-center text-xs text-slate-500">{url}</p><Button className="mt-4 w-full" variant="outline" onClick={() => void navigator.clipboard.writeText(url)}>Copy attendance link</Button></div>}</DialogContent></Dialog>;
+}
+
+function CreateTrainingDialog({ open, onOpenChange, trainers, trainings }: { open: boolean; onOpenChange: (open: boolean) => void; trainers: LocalTrainer[]; trainings: LocalTraining[] }) {
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const audience = String(data.get("audience"));
+    const audienceRoles = audience === "all" ? [Role.AGENT, Role.SALES_MANAGER, Role.HOA, Role.TRAINER] : audience === "leaders" ? [Role.SALES_MANAGER, Role.HOA] : [Role.AGENT];
+    saveTrainings([...trainings, {
+      id: `training-${Date.now()}`,
+      title: String(data.get("title")),
+      description: String(data.get("description")),
+      trainerId: String(data.get("trainerId")),
+      scheduledAt: new Date(String(data.get("scheduledAt"))).toISOString(),
+      durationHours: Number(data.get("durationHours")),
+      location: String(data.get("location")),
+      audienceRoles,
+      capacity: Number(data.get("capacity")),
+      status: "SCHEDULED",
+    }]);
+    event.currentTarget.reset(); onOpenChange(false);
+  };
+  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="sm:max-w-2xl"><DialogHeader><DialogTitle>Schedule training</DialogTitle><DialogDescription>The programme becomes immediately available for QR attendance.</DialogDescription></DialogHeader><form onSubmit={submit} className="grid gap-4 sm:grid-cols-2"><Field label="Programme title" name="title" /><Field label="Location" name="location" /><Field label="Date and time" name="scheduledAt" type="datetime-local" /><Field label="Duration (hours)" name="durationHours" type="number" defaultValue="2" /><Field label="Capacity" name="capacity" type="number" defaultValue="40" /><div className="space-y-2"><Label htmlFor="trainerId">Trainer</Label><select id="trainerId" name="trainerId" required className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm">{trainers.map((trainer) => <option key={trainer.id} value={trainer.id}>{trainer.firstName} {trainer.lastName}</option>)}</select></div><div className="space-y-2"><Label htmlFor="audience">Intended participants</Label><select id="audience" name="audience" className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm"><option value="agents">Agents</option><option value="leaders">Sales managers & HOAs</option><option value="all">All workforce</option></select></div><div className="space-y-2 sm:col-span-2"><Label htmlFor="description">Description</Label><textarea id="description" name="description" required className="min-h-24 w-full rounded-md border border-slate-300 bg-white p-3 text-sm" /></div><DialogFooter className="sm:col-span-2"><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button><Button type="submit" className="bg-[#9b1b36] hover:bg-[#7b172e]">Schedule programme</Button></DialogFooter></form></DialogContent></Dialog>;
+}
+
+function Field({ label, name, type = "text", defaultValue }: { label: string; name: string; type?: string; defaultValue?: string }) { return <div className="space-y-2"><Label htmlFor={name}>{label}</Label><Input id={name} name={name} type={type} defaultValue={defaultValue} required /></div>; }
+
+export default function TrainingsPage() { return <ProtectedRoute requiredPermissions={[Permission.TRAININGS_READ]}><DashboardShell><TrainingsWorkspace /><NotificationPanel /></DashboardShell></ProtectedRoute>; }

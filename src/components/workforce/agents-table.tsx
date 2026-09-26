@@ -22,7 +22,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
-import { formatCurrency, formatDate, getInitials, getComplianceColor } from "@/lib/utils";
+import {
+  compareSortableValues,
+  formatCurrency,
+  formatDate,
+  getComplianceColor,
+  getInitials,
+} from "@/lib/utils";
 import { MoreHorizontal, Eye, Edit, Phone, Mail } from "lucide-react";
 
 interface Agent {
@@ -81,24 +87,22 @@ export function AgentsTable({ agents, filters }: AgentsTableProps) {
 
   // Sort agents
   const sortedAgents = [...filteredAgents].sort((a, b) => {
-    let aValue: any = a[sortBy as keyof Agent];
-    let bValue: any = b[sortBy as keyof Agent];
+    const getValue = (agent: Agent): string | number => {
+      switch (sortBy) {
+        case "firstName":
+          return `${agent.firstName} ${agent.lastName}`;
+        case "production":
+          return agent.production?.monthlyProduction ?? 0;
+        case "trainingCompliance":
+          return agent.trainingCompliance;
+        case "appointmentDate":
+          return agent.appointmentDate;
+        default:
+          return agent.agentId;
+      }
+    };
 
-    if (sortBy === "production") {
-      aValue = a.production?.monthlyProduction || 0;
-      bValue = b.production?.monthlyProduction || 0;
-    }
-
-    if (typeof aValue === "string") {
-      aValue = aValue.toLowerCase();
-      bValue = bValue.toLowerCase();
-    }
-
-    if (sortOrder === "asc") {
-      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-    } else {
-      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-    }
+    return compareSortableValues(getValue(a), getValue(b), sortOrder);
   });
 
   const handleSort = (column: string) => {

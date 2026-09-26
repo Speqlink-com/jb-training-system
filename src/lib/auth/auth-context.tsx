@@ -1,130 +1,80 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { User, AuthState } from "@/types";
-import { Role } from "@/config/permissions";
+import type { User, AuthState } from "@/types";
+import { Permission, Role, rolePermissions } from "@/config/permissions";
 import { authService } from "@/lib/auth/auth-service";
+import { PLATFORM_CHANGE_EVENT } from "@/lib/local-platform";
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   updateUser: (user: Partial<User>) => void;
-  hasPermission: (permission: string) => boolean;
+  hasPermission: (permission: Permission) => boolean;
   hasRole: (role: Role) => boolean;
   checkApiHealth: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check for stored auth on mount
   useEffect(() => {
-    const initAuth = async () => {
-      try {
-        // Simplified auth check for demo mode
-        const storedUser = authService.getCurrentUser();
-        if (storedUser && authService.isAuthenticated()) {
-          setUser(storedUser);
-          setIsAuthenticated(true);
-        }
-      } catch (error) {
-        console.error("Auth initialization error:", error);
-      } finally {
-        setIsLoading(false);
-      }
+    const syncSession = () => setUser(authService.restoreSession());
+    const initialize = () => {
+      syncSession();
+      setIsLoading(false);
     };
-
-    initAuth();
+    const timer = window.setTimeout(initialize, 0);
+    window.addEventListener("storage", syncSession);
+    window.addEventListener(PLATFORM_CHANGE_EVENT, syncSession);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("storage", syncSession);
+      window.removeEventListener(PLATFORM_CHANGE_EVENT, syncSession);
+    };
   }, []);
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
-    
     try {
       const result = await authService.login({ email, password });
-      
-      if (result.success && result.user) {
-        setUser(result.user);
-        setIsAuthenticated(true);
-        authService.storeUser(result.user);
-        
-        return { success: true };
-      } else {
-        return { 
-          success: false, 
-          error: result.error || "Login failed" 
-        };
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : "An error occurred during login" 
-      };
+      if (result.user) setUser(result.user);
+      return { success: result.success, error: result.error };
     } finally {
       setIsLoading(false);
     }
   };
 
   const logout = async () => {
-    try {
-      await authService.logout();
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      setUser(null);
-      setIsAuthenticated(false);
-      authService.clearUser();
-    }
+    await authService.logout();
+    setUser(null);
   };
 
   const updateUser = (updates: Partial<User>) => {
-    if (user) {
-      const updatedUser = { ...user, ...updates };
-      setUser(updatedUser);
-      authService.storeUser(updatedUser);
-    }
+    if (!user) return;
+    const updated = { ...user, ...updates };
+    setUser(updated);
+    authService.storeUser(updated);
   };
 
-  const hasPermission = (permission: string): boolean => {
-    if (!user) return false;
-    
-    // Import permissions dynamically to avoid circular deps
-    const { rolePermissions } = require("@/config/permissions");
-    const userPermissions = rolePermissions[user.role] || [];
-    return userPermissions.includes(permission);
-  };
-
-  const hasRole = (role: Role): boolean => {
-    return user?.role === role;
-  };
-
-  const checkApiHealth = async (): Promise<boolean> => {
-    return authService.checkApiHealth();
-  };
-
-  const value: AuthContextType = {
-    user,
-    isLoading,
-    isAuthenticated,
-    login,
-    logout,
-    updateUser,
-    hasPermission,
-    hasRole,
-    checkApiHealth,
-  };
+  const hasPermission = (permission: Permission) =>
+    user ? (rolePermissions[user.role] || []).includes(permission) : false;
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{
+      user,
+      isLoading,
+      isAuthenticated: Boolean(user),
+      login,
+      logout,
+      updateUser,
+      hasPermission,
+      hasRole: (role) => user?.role === role,
+      checkApiHealth: () => authService.checkApiHealth(),
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -132,8 +82,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 }

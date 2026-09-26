@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -64,6 +63,8 @@ interface CandidateHeaderProps {
   };
 }
 
+const PAGE_LOADED_AT = Date.now();
+
 export function CandidateHeader({ candidate }: CandidateHeaderProps) {
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -94,7 +95,7 @@ export function CandidateHeader({ candidate }: CandidateHeaderProps) {
   };
 
   const daysSinceApplication = Math.floor(
-    (Date.now() - new Date(candidate.applicationDate).getTime()) / (1000 * 60 * 60 * 24)
+    (PAGE_LOADED_AT - new Date(candidate.applicationDate).getTime()) / (1000 * 60 * 60 * 24)
   );
 
   return (

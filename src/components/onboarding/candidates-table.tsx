@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
-import { formatDate } from "@/lib/utils";
+import { compareSortableValues, formatDate } from "@/lib/utils";
 import { 
   MoreHorizontal, 
   Eye, 
@@ -95,6 +95,8 @@ interface CandidatesTableProps {
   };
 }
 
+const PAGE_LOADED_AT = Date.now();
+
 export function CandidatesTable({ candidates, filters }: CandidatesTableProps) {
   const [sortBy, setSortBy] = useState<string>("applicationDate");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -123,24 +125,9 @@ export function CandidatesTable({ candidates, filters }: CandidatesTableProps) {
 
   // Sort candidates
   const sortedCandidates = [...filteredCandidates].sort((a, b) => {
-    let aValue: any = a[sortBy as keyof Candidate];
-    let bValue: any = b[sortBy as keyof Candidate];
-
-    if (sortBy === "name") {
-      aValue = `${a.firstName} ${a.lastName}`;
-      bValue = `${b.firstName} ${b.lastName}`;
-    }
-
-    if (typeof aValue === "string") {
-      aValue = aValue.toLowerCase();
-      bValue = bValue.toLowerCase();
-    }
-
-    if (sortOrder === "asc") {
-      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-    } else {
-      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-    }
+    const aValue = sortBy === "name" ? `${a.firstName} ${a.lastName}` : a.applicationDate;
+    const bValue = sortBy === "name" ? `${b.firstName} ${b.lastName}` : b.applicationDate;
+    return compareSortableValues(aValue, bValue, sortOrder);
   });
 
   const handleSort = (column: string) => {
@@ -309,7 +296,7 @@ export function CandidatesTable({ candidates, filters }: CandidatesTableProps) {
                         {formatDate(candidate.applicationDate, "MMM dd, yyyy")}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {Math.floor((Date.now() - new Date(candidate.applicationDate).getTime()) / (1000 * 60 * 60 * 24))} days ago
+                        {Math.floor((PAGE_LOADED_AT - new Date(candidate.applicationDate).getTime()) / (1000 * 60 * 60 * 24))} days ago
                       </p>
                       {candidate.expectedStartDate && (
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">

@@ -24,7 +24,8 @@ export function ProtectedRoute({
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push(fallbackUrl);
+      const next = `${window.location.pathname}${window.location.search}`;
+      router.push(`${fallbackUrl}?next=${encodeURIComponent(next)}`);
       return;
     }
 

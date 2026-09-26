@@ -104,7 +104,7 @@ export function CreateTrainerDialog({
       });
 
       addNotification({
-        id: Date.now().toString(),
+        id: `trainer-created-${data.email}`,
         title: "Trainer Created",
         message: `${data.firstName} ${data.lastName} has been successfully added as a trainer.`,
         type: "success",
@@ -115,9 +115,9 @@ export function CreateTrainerDialog({
       setSelectedSpecializations([]);
       onOpenChange(false);
       onSuccess?.();
-    } catch (error) {
+    } catch {
       addNotification({
-        id: Date.now().toString(),
+        id: `trainer-error-${data.email}`,
         title: "Error",
         message: "Failed to create trainer. Please try again.",
         type: "error",

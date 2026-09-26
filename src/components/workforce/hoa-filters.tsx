@@ -18,14 +18,16 @@ import {
   UserCheck
 } from "lucide-react";
 
-interface HOAFiltersProps {
-  filters: {
+export interface HoaFilterValues {
     search: string;
     region: string;
     status: string;
     performanceRange: { min: string; max: string };
-  };
-  onFiltersChange: (filters: any) => void;
+}
+
+interface HOAFiltersProps {
+  filters: HoaFilterValues;
+  onFiltersChange: (filters: HoaFilterValues) => void;
 }
 
 const regions = [
@@ -43,7 +45,7 @@ const statuses = [
 ];
 
 export function HOAFilters({ filters, onFiltersChange }: HOAFiltersProps) {
-  const handleFilterChange = (key: string, value: any) => {
+  const handleFilterChange = (key: Exclude<keyof HoaFilterValues, "performanceRange">, value: string) => {
     onFiltersChange({
       ...filters,
       [key]: value,
@@ -175,7 +177,7 @@ export function HOAFilters({ filters, onFiltersChange }: HOAFiltersProps) {
           <div className="flex items-center gap-2 flex-wrap">
             {filters.search && (
               <span className="px-2 py-1 bg-secondary rounded-md">
-                Search: "{filters.search}"
+                Search: &ldquo;{filters.search}&rdquo;
               </span>
             )}
             {filters.region && (

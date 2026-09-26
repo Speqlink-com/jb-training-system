@@ -14,10 +14,17 @@ import { Plus, Calendar, Clock, Users, MapPin } from "lucide-react";
 
 interface CreateTrainingDialogProps {
   children?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function CreateTrainingDialog({ children }: CreateTrainingDialogProps) {
-  const [open, setOpen] = useState(false);
+export function CreateTrainingDialog({ children, open, onOpenChange }: CreateTrainingDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const dialogOpen = open ?? internalOpen;
+  const setDialogOpen = (nextOpen: boolean) => {
+    setInternalOpen(nextOpen);
+    onOpenChange?.(nextOpen);
+  };
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -41,7 +48,7 @@ export function CreateTrainingDialog({ children }: CreateTrainingDialogProps) {
     e.preventDefault();
     console.log("Creating training:", formData);
     // Here you would typically make an API call
-    setOpen(false);
+    setDialogOpen(false);
     setFormData({
       title: "",
       description: "",
@@ -59,7 +66,7 @@ export function CreateTrainingDialog({ children }: CreateTrainingDialogProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         {children || (
           <Button>
@@ -258,7 +265,7 @@ export function CreateTrainingDialog({ children }: CreateTrainingDialogProps) {
           </Card>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
             <Button type="submit">

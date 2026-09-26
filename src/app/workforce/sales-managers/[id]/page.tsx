@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { notFound } from "next/navigation";
 import { ProtectedRoute } from "@/lib/auth/protected-route";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { NotificationPanel } from "@/components/layout/notification-panel";
@@ -144,12 +143,6 @@ const mockSalesManager = {
   ]
 };
 
-interface SalesManagerProfilePageProps {
-  params: {
-    id: string;
-  };
-}
-
 function SalesManagerProfileContent({ salesManager }: { salesManager: typeof mockSalesManager }) {
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -194,13 +187,8 @@ function SalesManagerProfileContent({ salesManager }: { salesManager: typeof moc
   );
 }
 
-export default function SalesManagerProfilePage({ params }: SalesManagerProfilePageProps) {
-  // In a real app, fetch sales manager data based on params.id
+export default function SalesManagerProfilePage() {
   const salesManager = mockSalesManager;
-  
-  if (!salesManager) {
-    notFound();
-  }
 
   return (
     <ProtectedRoute 

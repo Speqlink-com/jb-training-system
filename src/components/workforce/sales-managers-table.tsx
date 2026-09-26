@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
-import { formatDate, formatCurrency } from "@/lib/utils";
+import { compareSortableValues, formatDate, formatCurrency } from "@/lib/utils";
 import { 
   MoreHorizontal, 
   Eye, 
@@ -69,7 +69,7 @@ interface SalesManager {
   };
   certifications: Array<{
     name: string;
-    status: "COMPLETED" | "IN_PROGRESS" | "PENDING" | "EXPIRED";
+    status: string;
     expiryDate: string | null;
   }>;
 }
@@ -110,24 +110,12 @@ export function SalesManagersTable({ salesManagers, filters }: SalesManagersTabl
 
   // Sort sales managers
   const sortedManagers = [...filteredManagers].sort((a, b) => {
-    let aValue: any = a[sortBy as keyof SalesManager];
-    let bValue: any = b[sortBy as keyof SalesManager];
+    const getValue = (manager: SalesManager): string | number =>
+      sortBy === "name"
+        ? `${manager.firstName} ${manager.lastName}`
+        : manager.achievementRate;
 
-    if (sortBy === "name") {
-      aValue = `${a.firstName} ${a.lastName}`;
-      bValue = `${b.firstName} ${b.lastName}`;
-    }
-
-    if (typeof aValue === "string") {
-      aValue = aValue.toLowerCase();
-      bValue = bValue.toLowerCase();
-    }
-
-    if (sortOrder === "asc") {
-      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-    } else {
-      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-    }
+    return compareSortableValues(getValue(a), getValue(b), sortOrder);
   });
 
   const handleSort = (column: string) => {

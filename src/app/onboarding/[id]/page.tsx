@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { notFound } from "next/navigation";
 import { ProtectedRoute } from "@/lib/auth/protected-route";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { NotificationPanel } from "@/components/layout/notification-panel";
@@ -167,12 +166,6 @@ const mockCandidate = {
   ]
 };
 
-interface CandidateProfilePageProps {
-  params: {
-    id: string;
-  };
-}
-
 function CandidateProfileContent({ candidate }: { candidate: typeof mockCandidate }) {
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -219,13 +212,8 @@ function CandidateProfileContent({ candidate }: { candidate: typeof mockCandidat
   );
 }
 
-export default function CandidateProfilePage({ params }: CandidateProfilePageProps) {
-  // In a real app, fetch candidate data based on params.id
+export default function CandidateProfilePage() {
   const candidate = mockCandidate;
-  
-  if (!candidate) {
-    notFound();
-  }
 
   return (
     <ProtectedRoute 

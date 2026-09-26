@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNotificationStore } from "@/stores/notification.store";
-import { Trainer } from "@/types";
+import type { TrainerFilters } from "@/components/workforce/trainer-filters";
 import { 
   MoreHorizontal,
   Eye,
@@ -39,84 +39,38 @@ import {
   Clock
 } from "lucide-react";
 
-interface TrainersTableProps {
-  trainers: Trainer[];
-  onEdit: (trainer: Trainer) => void;
-  onView: (trainer: Trainer) => void;
+export interface TrainerListItem {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  specializations: string[];
+  status: "ACTIVE" | "INACTIVE";
+  totalTrainings: number;
+  completedTrainings: number;
+  totalParticipants: number;
+  averageRating: number;
+  certificationLevel: string;
+  upcomingTrainings: Array<{ id: string }>;
+  certifications: Array<{ name: string; status: string }>;
 }
 
-// Mock trainers data
-const mockTrainers: Trainer[] = [
-  {
-    id: "1",
-    firstName: "John",
-    lastName: "Smith",
-    email: "john.smith@trainsyt.com",
-    specialization: ["Product Training", "Sales Methodology"],
-    totalManpower: 45,
-    trainingsConductive: 12,
-    upcomingTrainings: 3,
-    pendingReports: 1,
-    isActive: true,
-  },
-  {
-    id: "2",
-    firstName: "Sarah",
-    lastName: "Johnson",
-    email: "sarah.johnson@trainsyt.com",
-    specialization: ["Compliance Training", "Leadership Development"],
-    totalManpower: 38,
-    trainingsConductive: 8,
-    upcomingTrainings: 2,
-    pendingReports: 0,
-    isActive: true,
-  },
-  {
-    id: "3",
-    firstName: "Michael",
-    lastName: "Davis",
-    email: "michael.davis@trainsyt.com",
-    specialization: ["Technical Skills", "Software Training"],
-    totalManpower: 52,
-    trainingsConductive: 15,
-    upcomingTrainings: 4,
-    pendingReports: 2,
-    isActive: true,
-  },
-  {
-    id: "4",
-    firstName: "Emily",
-    lastName: "Brown",
-    email: "emily.brown@trainsyt.com",
-    specialization: ["Communication Skills", "Customer Service"],
-    totalManpower: 35,
-    trainingsConductive: 10,
-    upcomingTrainings: 1,
-    pendingReports: 0,
-    isActive: false,
-  },
-  {
-    id: "5",
-    firstName: "David",
-    lastName: "Wilson",
-    email: "david.wilson@trainsyt.com",
-    specialization: ["Sales Methodology", "Leadership Development"],
-    totalManpower: 42,
-    trainingsConductive: 11,
-    upcomingTrainings: 2,
-    pendingReports: 1,
-    isActive: true,
-  },
-];
+interface TrainersTableProps {
+  trainers: TrainerListItem[];
+  filters?: TrainerFilters;
+  onEdit?: (trainer: TrainerListItem) => void;
+  onView?: (trainer: TrainerListItem) => void;
+}
 
 export function TrainersTable({ 
-  trainers = mockTrainers, 
-  onEdit, 
-  onView 
+  trainers,
+  filters,
+  onEdit = () => undefined,
+  onView = () => undefined,
 }: TrainersTableProps) {
   const { addNotification } = useNotificationStore();
 
-  const handleDelete = async (trainer: Trainer) => {
+  const handleDelete = async (trainer: TrainerListItem) => {
     if (!confirm(`Are you sure you want to remove ${trainer.firstName} ${trainer.lastName} from the system? This action cannot be undone.`)) {
       return;
     }
@@ -157,13 +111,33 @@ export function TrainersTable({
     }
   };
 
+  const filteredTrainers = trainers.filter((trainer) => {
+    if (!filters) return true;
+    const search = filters.search.toLowerCase();
+    const matchesSearch =
+      !search ||
+      `${trainer.firstName} ${trainer.lastName}`.toLowerCase().includes(search) ||
+      trainer.email.toLowerCase().includes(search);
+    const matchesSpecialization =
+      !filters.specialization || trainer.specializations.includes(filters.specialization);
+    const matchesAvailability =
+      !filters.availability ||
+      (filters.availability === "available" && trainer.upcomingTrainings.length < 2) ||
+      (filters.availability === "busy" && trainer.upcomingTrainings.length >= 2);
+    const matchesCertification =
+      !filters.certification ||
+      trainer.certifications.some((certification) => certification.status === filters.certification);
+
+    return matchesSearch && matchesSpecialization && matchesAvailability && matchesCertification;
+  });
+
   return (
     <>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <GraduationCap className="h-5 w-5" />
-            Trainers ({trainers.length})
+            Trainers ({filteredTrainers.length})
           </CardTitle>
           <CardDescription>
             Manage training staff and their assignments
@@ -183,8 +157,8 @@ export function TrainersTable({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {trainers.map((trainer) => {
-                  const workloadStatus = getWorkloadStatus(trainer.upcomingTrainings || 0);
+                {filteredTrainers.map((trainer) => {
+                  const workloadStatus = getWorkloadStatus(trainer.upcomingTrainings.length);
                   const WorkloadIcon = workloadStatus.icon;
 
                   return (
@@ -211,14 +185,14 @@ export function TrainersTable({
                       
                       <TableCell>
                         <div className="space-y-1">
-                          {trainer.specialization?.slice(0, 2).map((spec, index) => (
+                          {trainer.specializations.slice(0, 2).map((spec, index) => (
                             <Badge key={index} variant="outline" className="text-xs">
                               {spec}
                             </Badge>
                           ))}
-                          {(trainer.specialization?.length || 0) > 2 && (
+                          {trainer.specializations.length > 2 && (
                             <Badge variant="outline" className="text-xs">
-                              +{(trainer.specialization?.length || 0) - 2} more
+                              +{trainer.specializations.length - 2} more
                             </Badge>
                           )}
                         </div>
@@ -237,10 +211,10 @@ export function TrainersTable({
                             </span>
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {trainer.upcomingTrainings} upcoming sessions
+                            {trainer.upcomingTrainings.length} upcoming sessions
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {trainer.totalManpower} total trainees
+                            {trainer.totalParticipants} total trainees
                           </div>
                         </div>
                       </TableCell>
@@ -249,20 +223,18 @@ export function TrainersTable({
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
                             <Calendar className="h-3 w-3" />
-                            <span className="text-sm">{trainer.trainingsConductive} completed</span>
+                            <span className="text-sm">{trainer.completedTrainings} completed</span>
                           </div>
-                          {(trainer.pendingReports || 0) > 0 && (
-                            <div className="flex items-center gap-2 text-orange-600">
-                              <Clock className="h-3 w-3" />
-                              <span className="text-xs">{trainer.pendingReports} pending reports</span>
-                            </div>
-                          )}
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Award className="h-3 w-3" />
+                            <span className="text-xs">{trainer.averageRating}/5 average rating</span>
+                          </div>
                         </div>
                       </TableCell>
                       
                       <TableCell>
-                        <Badge variant={trainer.isActive ? "default" : "secondary"}>
-                          {trainer.isActive ? "Active" : "Inactive"}
+                        <Badge variant={trainer.status === "ACTIVE" ? "default" : "secondary"}>
+                          {trainer.status === "ACTIVE" ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
                       

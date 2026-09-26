@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle, XCircle, RefreshCw } from "lucide-react";
@@ -15,28 +15,36 @@ export function ApiStatus({ showRefreshButton = true, className }: ApiStatusProp
   const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
   const [lastCheck, setLastCheck] = useState<Date | null>(null);
 
-  const checkApiHealth = async () => {
-    setStatus('checking');
+  const checkApiHealth = useCallback(async () => {
     try {
-      // In demo mode, always return connected without making API calls
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate check
+      await apiClient.healthCheck();
       setStatus('connected');
     } catch (error) {
       console.error('API health check failed:', error);
-      setStatus('connected'); // Always show connected in demo
+      setStatus('disconnected');
     } finally {
       setLastCheck(new Date());
     }
-  };
+  }, []);
 
   useEffect(() => {
-    checkApiHealth();
+    const initialCheck = setTimeout(() => {
+      void checkApiHealth();
+    }, 0);
     
     // Check every 60 seconds (reduced frequency)
     const interval = setInterval(checkApiHealth, 60000);
     
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      clearTimeout(initialCheck);
+      clearInterval(interval);
+    };
+  }, [checkApiHealth]);
+
+  const handleRefresh = () => {
+    setStatus('checking');
+    void checkApiHealth();
+  };
 
   const getStatusInfo = () => {
     switch (status) {
@@ -49,7 +57,7 @@ export function ApiStatus({ showRefreshButton = true, className }: ApiStatusProp
       case 'connected':
         return {
           icon: <CheckCircle className="h-4 w-4" />,
-          text: 'API Connected',
+          text: 'Local workspace ready',
           variant: 'default' as const,
         };
       case 'disconnected':
@@ -64,7 +72,7 @@ export function ApiStatus({ showRefreshButton = true, className }: ApiStatusProp
   const statusInfo = getStatusInfo();
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center gap-2 ${className ?? ""}`}>
       <Badge variant={statusInfo.variant} className="flex items-center gap-1">
         {statusInfo.icon}
         {statusInfo.text}
@@ -74,9 +82,10 @@ export function ApiStatus({ showRefreshButton = true, className }: ApiStatusProp
         <Button
           variant="ghost"
           size="sm"
-          onClick={checkApiHealth}
+          onClick={handleRefresh}
           disabled={status === 'checking'}
           className="h-6 w-6 p-0"
+          aria-label="Refresh API status"
         >
           <RefreshCw className={`h-3 w-3 ${status === 'checking' ? 'animate-spin' : ''}`} />
         </Button>

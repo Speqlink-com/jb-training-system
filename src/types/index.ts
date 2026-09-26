@@ -1,4 +1,4 @@
-import { Role, Permission } from "@/config/permissions";
+import { Role } from "@/config/permissions";
 import { ONBOARDING_STAGES, TRAINING_CATEGORIES } from "@/config/constants";
 
 // User and Authentication Types
@@ -180,7 +180,7 @@ export interface TrainingReport {
   period: string;
   generatedBy: string;
   generatedAt: string;
-  data: any; // JSON data for the report
+  data: unknown; // JSON data for the report
   filters?: ReportFilters;
 }
 

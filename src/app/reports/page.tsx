@@ -271,7 +271,7 @@ function ReportsContent() {
       </Tabs>
 
       {/* Export Options */}
-      <ExportReports />
+          <ExportReports data={mockAnalyticsData} />
     </div>
   );
 }

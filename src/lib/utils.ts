@@ -91,7 +91,7 @@ export function getComplianceStatus(compliance: number): string {
 }
 
 // Array utilities
-export function groupBy<T, K extends keyof any>(
+export function groupBy<T, K extends PropertyKey>(
   array: T[],
   getKey: (item: T) => K
 ): Record<K, T[]> {
@@ -156,7 +156,7 @@ export function createSearchFilter<T>(
 }
 
 // URL utilities
-export function buildSearchParams(params: Record<string, any>): string {
+export function buildSearchParams(params: Record<string, unknown>): string {
   const searchParams = new URLSearchParams();
   
   Object.entries(params).forEach(([key, value]) => {
@@ -166,6 +166,17 @@ export function buildSearchParams(params: Record<string, any>): string {
   });
   
   return searchParams.toString();
+}
+
+export function compareSortableValues(
+  first: string | number,
+  second: string | number,
+  order: "asc" | "desc",
+): number {
+  const normalizedFirst = typeof first === "string" ? first.toLowerCase() : first;
+  const normalizedSecond = typeof second === "string" ? second.toLowerCase() : second;
+  const result = normalizedFirst < normalizedSecond ? -1 : normalizedFirst > normalizedSecond ? 1 : 0;
+  return order === "asc" ? result : -result;
 }
 
 // Local storage utilities

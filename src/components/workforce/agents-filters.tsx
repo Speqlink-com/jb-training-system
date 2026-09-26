@@ -11,15 +11,17 @@ import {
 } from "@/components/ui/select";
 import { Search, Filter, X } from "lucide-react";
 
-interface AgentsFiltersProps {
-  filters: {
+export interface AgentFilterValues {
     search: string;
     branch: string;
     sm: string;
     hoa: string;
     compliance: string;
-  };
-  onFiltersChange: (filters: any) => void;
+}
+
+interface AgentsFiltersProps {
+  filters: AgentFilterValues;
+  onFiltersChange: (filters: AgentFilterValues) => void;
 }
 
 // Mock data for filter options - replace with API calls

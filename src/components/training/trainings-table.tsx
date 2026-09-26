@@ -21,14 +21,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
-import { formatDate, formatCurrency, getStatusColor } from "@/lib/utils";
+import { compareSortableValues, formatDate } from "@/lib/utils";
 import { TRAINING_CATEGORIES } from "@/config/constants";
 import { 
   MoreHorizontal, 
   Eye, 
   Edit, 
   Users, 
-  Calendar,
   MapPin,
   Clock,
   CheckCircle
@@ -97,24 +96,16 @@ export function TrainingsTable({ trainings, filters }: TrainingsTableProps) {
 
   // Sort trainings
   const sortedTrainings = [...filteredTrainings].sort((a, b) => {
-    let aValue: any = a[sortBy as keyof Training];
-    let bValue: any = b[sortBy as keyof Training];
+    const getValue = (training: Training): string | number => {
+      if (sortBy === "trainer") {
+        return `${training.trainer.firstName} ${training.trainer.lastName}`;
+      }
 
-    if (sortBy === "trainer") {
-      aValue = `${a.trainer.firstName} ${a.trainer.lastName}`;
-      bValue = `${b.trainer.firstName} ${b.trainer.lastName}`;
-    }
+      if (sortBy === "title") return training.title;
+      return training.scheduledDate;
+    };
 
-    if (typeof aValue === "string") {
-      aValue = aValue.toLowerCase();
-      bValue = bValue.toLowerCase();
-    }
-
-    if (sortOrder === "asc") {
-      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-    } else {
-      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-    }
+    return compareSortableValues(getValue(a), getValue(b), sortOrder);
   });
 
   const handleSort = (column: string) => {

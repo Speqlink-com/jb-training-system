@@ -19,15 +19,17 @@ import {
   UserCheck
 } from "lucide-react";
 
-interface SalesManagerFiltersProps {
-  filters: {
+export interface SalesManagerFilterValues {
     search: string;
     region: string;
     branch: string;
     status: string;
     performanceRange: { min: string; max: string };
-  };
-  onFiltersChange: (filters: any) => void;
+}
+
+interface SalesManagerFiltersProps {
+  filters: SalesManagerFilterValues;
+  onFiltersChange: (filters: SalesManagerFilterValues) => void;
 }
 
 const regions = [
@@ -54,7 +56,7 @@ const statuses = [
 ];
 
 export function SalesManagerFilters({ filters, onFiltersChange }: SalesManagerFiltersProps) {
-  const handleFilterChange = (key: string, value: any) => {
+  const handleFilterChange = (key: Exclude<keyof SalesManagerFilterValues, "performanceRange">, value: string) => {
     onFiltersChange({
       ...filters,
       [key]: value,
@@ -206,7 +208,7 @@ export function SalesManagerFilters({ filters, onFiltersChange }: SalesManagerFi
           <div className="flex items-center gap-2 flex-wrap">
             {filters.search && (
               <span className="px-2 py-1 bg-secondary rounded-md">
-                Search: "{filters.search}"
+                Search: &ldquo;{filters.search}&rdquo;
               </span>
             )}
             {filters.region && (

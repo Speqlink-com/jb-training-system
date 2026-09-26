@@ -24,6 +24,7 @@ import {
 import { TRAINING_CATEGORIES } from "@/config/constants";
 
 interface TrainerFiltersProps {
+  filters: TrainerFilters;
   onFiltersChange: (filters: TrainerFilters) => void;
 }
 
@@ -36,21 +37,12 @@ export interface TrainerFilters {
   certification: string;
 }
 
-export function TrainerFilters({ onFiltersChange }: TrainerFiltersProps) {
-  const [filters, setFilters] = useState<TrainerFilters>({
-    search: "",
-    specialization: "",
-    experience: "",
-    capacity: "",
-    availability: "",
-    certification: "",
-  });
+export function TrainerFilters({ filters, onFiltersChange }: TrainerFiltersProps) {
 
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
   const updateFilter = (key: keyof TrainerFilters, value: string) => {
     const newFilters = { ...filters, [key]: value };
-    setFilters(newFilters);
     onFiltersChange(newFilters);
     
     // Count active filters
@@ -67,7 +59,6 @@ export function TrainerFilters({ onFiltersChange }: TrainerFiltersProps) {
       availability: "",
       certification: "",
     };
-    setFilters(clearedFilters);
     onFiltersChange(clearedFilters);
     setActiveFiltersCount(0);
   };
@@ -140,8 +131,8 @@ export function TrainerFilters({ onFiltersChange }: TrainerFiltersProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">All specializations</SelectItem>
-                {Object.values(TRAINING_CATEGORIES).map((category) => (
-                  <SelectItem key={category} value={category}>
+                {Object.entries(TRAINING_CATEGORIES).map(([key, category]) => (
+                  <SelectItem key={key} value={key}>
                     {category}
                   </SelectItem>
                 ))}
