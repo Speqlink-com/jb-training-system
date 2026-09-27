@@ -18,6 +18,7 @@ import {
   getTrainers,
   getTrainings,
   PLATFORM_CHANGE_EVENT,
+  registrationsForTraining,
   saveTrainings,
   trainerName,
   type LocalTrainer,
@@ -30,7 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-type TrainingExportRow = LocalTraining & { trainer: string; attendance: number };
+type TrainingExportRow = LocalTraining & { trainer: string; registrations: number; attendance: number };
 const columns: ExcelExportColumn<TrainingExportRow>[] = [
   { header: "Programme", value: (row) => row.title, width: 34 },
   { header: "Trainer", value: (row) => row.trainer, width: 24 },
@@ -38,6 +39,7 @@ const columns: ExcelExportColumn<TrainingExportRow>[] = [
   { header: "Location", value: (row) => row.location, width: 34 },
   { header: "Audience", value: (row) => row.audienceRoles.join(", "), width: 32 },
   { header: "Capacity", value: (row) => row.capacity, width: 13 },
+  { header: "Registered", value: (row) => row.registrations, width: 15 },
   { header: "Attendance", value: (row) => row.attendance, width: 15 },
   { header: "Status", value: (row) => row.status, width: 16 },
 ];
@@ -60,6 +62,7 @@ function TrainingsWorkspace() {
   const rows = useMemo<TrainingExportRow[]>(() => trainings.map((training) => ({
     ...training,
     trainer: trainerName(training.trainerId, trainers),
+    registrations: registrationsForTraining(training.id).length,
     attendance: attendanceForTraining(training.id).length,
   })), [trainings, trainers]);
   const canManage = user?.role === Role.ADMIN || user?.role === Role.TRAINER;
@@ -67,7 +70,7 @@ function TrainingsWorkspace() {
   const attendeeTotal = rows.reduce((sum, row) => sum + row.attendance, 0);
 
   return <div className="mx-auto max-w-[1440px] space-y-7 px-5 py-7 sm:px-8 lg:px-12 lg:py-10">
-    <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.19em] text-[#9b1b36]">Learning operations</p><h1 className="mt-2 text-4xl font-bold tracking-[-0.045em] text-[#171d25]">Training programmes</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">Schedule learning, issue a secure programme QR, and capture named attendance from signed-in participants.</p></div><div className="flex flex-wrap gap-2">{canManage && <><ExcelExportButton columns={columns} rows={rows} fileName="jubilee-training-programmes" sheetName="Programmes" title="Jubilee training programmes" /><Button asChild variant="outline"><Link href="/trainings/attendance"><Users className="mr-2 h-4 w-4" />Attendance console</Link></Button><Button onClick={() => setCreateOpen(true)} className="bg-[#9b1b36] hover:bg-[#7b172e]"><Plus className="mr-2 h-4 w-4" />New programme</Button></>}</div></header>
+    <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.19em] text-[#9b1b36]">Learning operations</p><h1 className="mt-2 text-4xl font-bold tracking-[-0.045em] text-[#171d25]">Training programmes</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">Schedule learning and share a public QR link where any participant can join using their role and unique code, then mark attendance.</p></div><div className="flex flex-wrap gap-2">{canManage && <><ExcelExportButton columns={columns} rows={rows} fileName="jubilee-training-programmes" sheetName="Programmes" title="Jubilee training programmes" /><Button asChild variant="outline"><Link href="/trainings/attendance"><Users className="mr-2 h-4 w-4" />Attendance console</Link></Button><Button onClick={() => setCreateOpen(true)} className="bg-[#9b1b36] hover:bg-[#7b172e]"><Plus className="mr-2 h-4 w-4" />New programme</Button></>}</div></header>
 
     <section className="grid gap-4 sm:grid-cols-3">{[
       { label: "Programmes", value: relevant.length, icon: GraduationCap },
@@ -78,8 +81,8 @@ function TrainingsWorkspace() {
     <section className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
       {relevant.map((training) => {
         const present = attendanceForTraining(training.id).length;
-        const eligible = user ? canAttend(training, user) : false;
-        return <article key={training.id} className="flex min-h-[310px] flex-col rounded-xl border border-[#dce1e3] bg-white p-6 shadow-[0_1px_2px_rgba(20,30,34,0.025)]"><div className="flex items-start justify-between gap-4"><Badge className={training.status === "IN_PROGRESS" ? "bg-amber-50 text-amber-700 hover:bg-amber-50" : "bg-[#f7ecef] text-[#7b172e] hover:bg-[#f7ecef]"}>{training.status.replaceAll("_", " ")}</Badge><span className="text-xs font-semibold text-slate-400">{present}/{training.capacity}</span></div><h2 className="mt-5 text-xl font-semibold tracking-tight text-slate-900">{training.title}</h2><p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">{training.description}</p><div className="mt-5 space-y-2.5 text-sm text-slate-600"><p className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-[#9b1b36]" />{new Date(training.scheduledAt).toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short" })}</p><p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-[#9b1b36]" />{training.location}</p><p className="flex items-center gap-2"><Clock3 className="h-4 w-4 text-[#9b1b36]" />{training.durationHours} hours · {trainerName(training.trainerId, trainers)}</p></div><div className="mt-auto flex gap-2 pt-6">{canManage ? <Button className="flex-1 bg-[#641329] hover:bg-[#4e0f20]" onClick={() => setQrTraining(training)}><QrCode className="mr-2 h-4 w-4" />Open QR</Button> : eligible ? <Button asChild className="flex-1 bg-[#9b1b36] hover:bg-[#7b172e]"><Link href={getCheckInPath(training.id)}><ScanLine className="mr-2 h-4 w-4" />Check in</Link></Button> : <Button className="flex-1" disabled>Not assigned</Button>}</div></article>;
+        const registered = registrationsForTraining(training.id).length;
+        return <article key={training.id} className="flex min-h-[310px] flex-col rounded-xl border border-[#dce1e3] bg-white p-6 shadow-[0_1px_2px_rgba(20,30,34,0.025)]"><div className="flex items-start justify-between gap-4"><Badge className={training.status === "IN_PROGRESS" ? "bg-amber-50 text-amber-700 hover:bg-amber-50" : "bg-[#f7ecef] text-[#7b172e] hover:bg-[#f7ecef]"}>{training.status.replaceAll("_", " ")}</Badge><span className="text-xs font-semibold text-slate-400">{registered} joined · {present} present</span></div><h2 className="mt-5 text-xl font-semibold tracking-tight text-slate-900">{training.title}</h2><p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">{training.description}</p><div className="mt-5 space-y-2.5 text-sm text-slate-600"><p className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-[#9b1b36]" />{new Date(training.scheduledAt).toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short" })}</p><p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-[#9b1b36]" />{training.location}</p><p className="flex items-center gap-2"><Clock3 className="h-4 w-4 text-[#9b1b36]" />{training.durationHours} hours · {trainerName(training.trainerId, trainers)}</p></div><div className="mt-auto flex gap-2 pt-6">{canManage ? <Button className="flex-1 bg-[#641329] hover:bg-[#4e0f20]" onClick={() => setQrTraining(training)}><QrCode className="mr-2 h-4 w-4" />Open public QR</Button> : <Button asChild className="flex-1 bg-[#9b1b36] hover:bg-[#7b172e]"><Link href={getCheckInPath(training.id)}><ScanLine className="mr-2 h-4 w-4" />Join programme</Link></Button>}</div></article>;
       })}
     </section>
     {relevant.length === 0 && <div className="rounded-xl border border-dashed border-slate-300 bg-white py-16 text-center"><GraduationCap className="mx-auto h-8 w-8 text-slate-300" /><p className="mt-3 font-medium text-slate-700">No programmes are assigned to your role.</p></div>}
@@ -97,7 +100,7 @@ function QrCanvas({ value }: { value: string }) {
 
 function TrainingQrDialog({ training, open, onOpenChange }: { training: LocalTraining | null; open: boolean; onOpenChange: (open: boolean) => void }) {
   const url = training && typeof window !== "undefined" ? `${window.location.origin}${getCheckInPath(training.id)}` : "";
-  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="sm:max-w-md"><DialogHeader><DialogTitle>Attendance QR</DialogTitle><DialogDescription>{training?.title}. Participants must sign in before attendance is recorded.</DialogDescription></DialogHeader>{training && url && <div className="flex flex-col items-center"><div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><QrCanvas value={url} /></div><p className="mt-4 break-all rounded-lg bg-slate-50 p-3 text-center text-xs text-slate-500">{url}</p><Button className="mt-4 w-full" variant="outline" onClick={() => void navigator.clipboard.writeText(url)}>Copy attendance link</Button></div>}</DialogContent></Dialog>;
+  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="sm:max-w-md"><DialogHeader><DialogTitle>Public programme QR</DialogTitle><DialogDescription>{training?.title}. Anyone with this link can enter their name, role and participant code to join, then mark attendance.</DialogDescription></DialogHeader>{training && url && <div className="flex flex-col items-center"><div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><QrCanvas value={url} /></div><p className="mt-4 break-all rounded-lg bg-slate-50 p-3 text-center text-xs text-slate-500">{url}</p><Button className="mt-4 w-full" variant="outline" onClick={() => void navigator.clipboard.writeText(url)}>Copy public join link</Button></div>}</DialogContent></Dialog>;
 }
 
 function CreateTrainingDialog({ open, onOpenChange, trainers, trainings }: { open: boolean; onOpenChange: (open: boolean) => void; trainers: LocalTrainer[]; trainings: LocalTraining[] }) {

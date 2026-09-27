@@ -5,6 +5,7 @@ const KEYS = {
   session: "jubilee.session.v1",
   trainers: "jubilee.trainers.v1",
   trainings: "jubilee.trainings.v1",
+  registrations: "jubilee.training-registrations.v1",
   attendance: "jubilee.attendance.v1",
 } as const;
 
@@ -44,12 +45,53 @@ export interface LocalTraining {
 export interface AttendanceRecord {
   id: string;
   trainingId: string;
-  userId: string;
+  registrationId?: string;
+  userId?: string;
   attendeeName: string;
-  attendeeEmail: string;
-  role: Role;
+  attendeeEmail?: string;
+  participantCode?: string;
+  role: ParticipantRole;
   checkedInAt: string;
   source: "QR";
+}
+
+export type ParticipantRole =
+  | "AGENT"
+  | "SALES_MANAGER"
+  | "HOA"
+  | "TRAINER"
+  | "ADMIN"
+  | "STAFF"
+  | "GUEST";
+
+export const PARTICIPANT_ROLE_LABELS: Record<ParticipantRole, string> = {
+  AGENT: "Agent",
+  SALES_MANAGER: "Sales Manager",
+  HOA: "Head of Agency (HOA)",
+  TRAINER: "Trainer",
+  ADMIN: "Administrator",
+  STAFF: "Jubilee Staff",
+  GUEST: "Guest / External participant",
+};
+
+export interface TrainingRegistration {
+  id: string;
+  trainingId: string;
+  participantName: string;
+  participantCode: string;
+  role: ParticipantRole;
+  email?: string;
+  phone?: string;
+  joinedAt: string;
+  source: "QR_LINK";
+}
+
+export interface RegistrationInput {
+  participantName: string;
+  participantCode: string;
+  role: ParticipantRole;
+  email?: string;
+  phone?: string;
 }
 
 const now = new Date().toISOString();
@@ -175,6 +217,19 @@ export function initializeLocalPlatform() {
   if (!window.localStorage.getItem(KEYS.trainers)) write(KEYS.trainers, SEED_TRAINERS);
   if (!window.localStorage.getItem(KEYS.trainings)) write(KEYS.trainings, SEED_TRAININGS);
   if (!window.localStorage.getItem(KEYS.attendance)) write(KEYS.attendance, []);
+  if (!window.localStorage.getItem(KEYS.registrations)) {
+    const legacyRegistrations = read<AttendanceRecord[]>(KEYS.attendance, []).map((record) => ({
+      id: record.registrationId || record.id,
+      trainingId: record.trainingId,
+      participantName: record.attendeeName,
+      participantCode: record.participantCode || record.userId || "LEGACY",
+      role: record.role,
+      email: record.attendeeEmail,
+      joinedAt: record.checkedInAt,
+      source: "QR_LINK" as const,
+    }));
+    write(KEYS.registrations, legacyRegistrations);
+  }
 }
 
 export function getStoredSession(): User | null {
@@ -214,22 +269,76 @@ export function getAttendance(): AttendanceRecord[] {
   return read<AttendanceRecord[]>(KEYS.attendance, []);
 }
 
-export function checkInToTraining(training: LocalTraining, user: User): AttendanceRecord {
-  const attendance = getAttendance();
-  const existing = attendance.find((item) => item.trainingId === training.id && item.userId === user.id);
+export function getRegistrations(): TrainingRegistration[] {
+  initializeLocalPlatform();
+  return read<TrainingRegistration[]>(KEYS.registrations, []);
+}
+
+export function registrationsForTraining(trainingId: string) {
+  return getRegistrations().filter((item) => item.trainingId === trainingId);
+}
+
+export function joinTraining(training: LocalTraining, input: RegistrationInput): TrainingRegistration {
+  const registrations = getRegistrations();
+  const participantName = input.participantName.trim();
+  const participantCode = input.participantCode.trim().toUpperCase();
+  if (!participantName || !participantCode) throw new Error("Name and participant code are required");
+
+  const existing = registrations.find(
+    (item) => item.trainingId === training.id
+      && item.role === input.role
+      && item.participantCode.toUpperCase() === participantCode,
+  );
   if (existing) return existing;
-  const record: AttendanceRecord = {
-    id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${user.id}`,
+  if (registrationsForTraining(training.id).length >= training.capacity) {
+    throw new Error("This programme has reached its participant capacity");
+  }
+
+  const registration: TrainingRegistration = {
+    id: createLocalId("registration"),
     trainingId: training.id,
-    userId: user.id,
-    attendeeName: `${user.firstName} ${user.lastName}`,
-    attendeeEmail: user.email,
-    role: user.role,
+    participantName,
+    participantCode,
+    role: input.role,
+    email: input.email?.trim().toLowerCase() || undefined,
+    phone: input.phone?.trim() || undefined,
+    joinedAt: new Date().toISOString(),
+    source: "QR_LINK",
+  };
+  write(KEYS.registrations, [...registrations, registration]);
+  return registration;
+}
+
+export function markRegistrationPresent(registration: TrainingRegistration): AttendanceRecord {
+  const attendance = getAttendance();
+  const existing = attendance.find(
+    (item) => item.registrationId === registration.id || item.id === registration.id,
+  );
+  if (existing) return existing;
+
+  const record: AttendanceRecord = {
+    id: createLocalId("attendance"),
+    trainingId: registration.trainingId,
+    registrationId: registration.id,
+    attendeeName: registration.participantName,
+    attendeeEmail: registration.email,
+    participantCode: registration.participantCode,
+    role: registration.role,
     checkedInAt: new Date().toISOString(),
     source: "QR",
   };
   write(KEYS.attendance, [...attendance, record]);
   return record;
+}
+
+export function checkInToTraining(training: LocalTraining, user: User): AttendanceRecord {
+  const registration = joinTraining(training, {
+    participantName: `${user.firstName} ${user.lastName}`,
+    participantCode: user.agentId || user.id,
+    role: user.role,
+    email: user.email,
+  });
+  return markRegistrationPresent(registration);
 }
 
 export function attendanceForTraining(trainingId: string) {
@@ -247,4 +356,10 @@ export function canAttend(training: LocalTraining, user: User) {
 
 export function getCheckInPath(trainingId: string) {
   return `/attendance/check-in?training=${encodeURIComponent(trainingId)}`;
+}
+
+function createLocalId(prefix: string) {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? `${prefix}-${crypto.randomUUID()}`
+    : `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
