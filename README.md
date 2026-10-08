@@ -38,4 +38,4 @@ pnpm build
 
 ## Vercel
 
-Keep `NEXT_PUBLIC_API_URL=/backend` and set the server-only `API_PROXY_TARGET` to the public HTTPS backend origin. Requests remain same-origin in the browser, so secure authentication cookies work reliably. The backend production cookie and trusted-host settings still need to match the deployed domains.
+Keep `NEXT_PUBLIC_API_URL=/backend` and set the server-only `API_PROXY_TARGET=https://trainsyt.speqlink.com`. Requests remain same-origin in the browser, so secure host-only authentication cookies work reliably. Redeploy Vercel after changing this environment variable.
