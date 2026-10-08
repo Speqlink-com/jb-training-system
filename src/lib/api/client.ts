@@ -1,4 +1,6 @@
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/$/, "");
+// Authentication must stay same-origin so the browser accepts the secure,
+// host-only session cookies returned through the Next.js backend proxy.
+const API_URL = "/backend";
 const REQUEST_TIMEOUT_MS = 12_000;
 
 interface ApiEnvelope<T> {

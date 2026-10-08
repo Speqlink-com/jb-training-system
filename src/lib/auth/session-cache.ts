@@ -15,12 +15,21 @@ export function getCachedUser(): User | null {
 
 export function cacheUser(user: User) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  try {
+    window.localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  } catch {
+    // The HTTP-only authentication cookie remains authoritative when browser
+    // privacy settings disable local storage.
+  }
   window.dispatchEvent(new CustomEvent(SESSION_CHANGE_EVENT));
 }
 
 export function clearCachedUser() {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem(SESSION_KEY);
+  try {
+    window.localStorage.removeItem(SESSION_KEY);
+  } catch {
+    // Clearing the server-issued cookie does not depend on local storage.
+  }
   window.dispatchEvent(new CustomEvent(SESSION_CHANGE_EVENT));
 }

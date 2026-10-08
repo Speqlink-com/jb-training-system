@@ -7,7 +7,6 @@ Next.js workspace for the QR-powered training and attendance platform.
 Use the same-origin backend proxy in `.env.local`:
 
 ```env
-NEXT_PUBLIC_API_URL=/backend
 API_PROXY_TARGET=http://127.0.0.1:8000
 ```
 
@@ -38,4 +37,4 @@ pnpm build
 
 ## Vercel
 
-Keep `NEXT_PUBLIC_API_URL=/backend` and set the server-only `API_PROXY_TARGET=https://trainsyt.speqlink.com:2096`. Port `2096` reaches the dedicated Trainsyt Nginx service instead of the shared Kong listener on port `443`. Requests remain same-origin in the browser, so secure host-only authentication cookies work reliably. Redeploy Vercel after changing this environment variable.
+Set the server-only `API_PROXY_TARGET=https://trainsyt.speqlink.com:2096`. The browser always uses the same-origin `/backend` proxy; no public API URL variable is required. Port `2096` reaches the dedicated Trainsyt Nginx service instead of the shared Kong listener on port `443`. Redeploy Vercel after changing this environment variable.
