@@ -38,4 +38,4 @@ pnpm build
 
 ## Vercel
 
-Keep `NEXT_PUBLIC_API_URL=/backend` and set the server-only `API_PROXY_TARGET=https://trainsyt.speqlink.com`. Requests remain same-origin in the browser, so secure host-only authentication cookies work reliably. Redeploy Vercel after changing this environment variable.
+Keep `NEXT_PUBLIC_API_URL=/backend` and set the server-only `API_PROXY_TARGET=https://trainsyt.speqlink.com:2096`. Port `2096` reaches the dedicated Trainsyt Nginx service instead of the shared Kong listener on port `443`. Requests remain same-origin in the browser, so secure host-only authentication cookies work reliably. Redeploy Vercel after changing this environment variable.
