@@ -4,10 +4,11 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import type { User, AuthState } from "@/types";
 import { Permission, Role, rolePermissions } from "@/config/permissions";
 import { authService } from "@/lib/auth/auth-service";
-import { PLATFORM_CHANGE_EVENT } from "@/lib/local-platform";
+import { SESSION_CHANGE_EVENT } from "@/lib/auth/session-cache";
 
 interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; passwordChangeRequired?: boolean }>;
+  completeFirstTimePasswordChange: (newPassword: string, confirmPassword: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   updateUser: (user: Partial<User>) => void;
   hasPermission: (permission: Permission) => boolean;
@@ -23,17 +24,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const syncSession = () => setUser(authService.restoreSession());
-    const initialize = () => {
-      syncSession();
-      setIsLoading(false);
+    const initialize = async () => {
+      try {
+        setUser(authService.restoreSession());
+        const verifiedUser = await authService.checkAuth();
+        setUser(verifiedUser);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    const timer = window.setTimeout(initialize, 0);
+    const timer = window.setTimeout(() => void initialize(), 0);
     window.addEventListener("storage", syncSession);
-    window.addEventListener(PLATFORM_CHANGE_EVENT, syncSession);
+    window.addEventListener(SESSION_CHANGE_EVENT, syncSession);
     return () => {
       window.clearTimeout(timer);
       window.removeEventListener("storage", syncSession);
-      window.removeEventListener(PLATFORM_CHANGE_EVENT, syncSession);
+      window.removeEventListener(SESSION_CHANGE_EVENT, syncSession);
     };
   }, []);
 
@@ -41,6 +47,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const result = await authService.login({ email, password });
+      if (result.user) setUser(result.user);
+      return {
+        success: result.success,
+        error: result.error,
+        passwordChangeRequired: result.passwordChangeRequired,
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const completeFirstTimePasswordChange = async (newPassword: string, confirmPassword: string) => {
+    setIsLoading(true);
+    try {
+      const result = await authService.completeFirstTimePasswordChange(newPassword, confirmPassword);
       if (result.user) setUser(result.user);
       return { success: result.success, error: result.error };
     } finally {
@@ -69,6 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       isAuthenticated: Boolean(user),
       login,
+      completeFirstTimePasswordChange,
       logout,
       updateUser,
       hasPermission,

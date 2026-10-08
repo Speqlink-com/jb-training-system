@@ -1,4 +1,4 @@
-import { LucideIcon, Users, GraduationCap, BarChart3, Settings, Bell, Home, UserCheck, TrendingUp, Calendar } from "lucide-react";
+import { LucideIcon, Users, GraduationCap, BarChart3, Home, UserCheck, TrendingUp, Calendar } from "lucide-react";
 
 export interface NavItem {
   title: string;
@@ -37,14 +37,14 @@ export const navigation: NavGroup[] = [
         href: "/agents",
         icon: Users,
         description: "Manage agents and their profiles",
-        roles: ["SALES_MANAGER", "HOA", "TRAINER", "ADMIN"]
+        roles: ["ADMIN"]
       },
       {
         title: "Sales Managers",
         href: "/workforce/sales-managers",
         icon: UserCheck,
         description: "Sales manager profiles and teams",
-        roles: ["HOA", "ADMIN"]
+        roles: ["ADMIN"]
       },
       {
         title: "HOAs",
@@ -61,7 +61,7 @@ export const navigation: NavGroup[] = [
         roles: ["ADMIN"]
       }
     ],
-    roles: ["SALES_MANAGER", "HOA", "TRAINER", "ADMIN"]
+    roles: ["ADMIN"]
   },
   {
     title: "Training",
@@ -71,7 +71,7 @@ export const navigation: NavGroup[] = [
         href: "/trainings",
         icon: GraduationCap,
         description: "Manage training programs and schedules",
-        roles: ["TRAINER", "ADMIN", "HOA"]
+        roles: ["TRAINER", "ADMIN", "HOA", "SALES_MANAGER"]
       },
       {
         title: "Attendance",
@@ -90,19 +90,6 @@ export const navigation: NavGroup[] = [
     ]
   },
   {
-    title: "Onboarding",
-    items: [
-      {
-        title: "New Joiners",
-        href: "/onboarding",
-        icon: UserCheck,
-        description: "Manage candidate onboarding process",
-        roles: ["SALES_MANAGER", "HOA", "ADMIN"]
-      }
-    ],
-    roles: ["SALES_MANAGER", "HOA", "ADMIN"]
-  },
-  {
     title: "Reports",
     items: [
       {
@@ -110,11 +97,11 @@ export const navigation: NavGroup[] = [
         href: "/reports",
         icon: BarChart3,
         description: "Analytics and reporting",
-        roles: ["HOA", "TRAINER", "ADMIN"]
+        roles: ["HOA", "SALES_MANAGER", "TRAINER", "ADMIN"]
       },
       {
-        title: "My Performance",
-        href: "/agents/performance",
+        title: "My Training Report",
+        href: "/reports",
         icon: TrendingUp,
         description: "Your performance metrics",
         roles: ["AGENT"]
@@ -130,28 +117,9 @@ export const navigation: NavGroup[] = [
         icon: Users,
         description: "User management and permissions",
         roles: ["ADMIN"]
-      },
-      {
-        title: "Settings",
-        href: "/settings",
-        icon: Settings,
-        description: "System configuration",
-        roles: ["ADMIN"]
       }
     ],
     roles: ["ADMIN"]
-  },
-  {
-    title: "Notifications",
-    items: [
-      {
-        title: "Notifications",
-        href: "/notifications",
-        icon: Bell,
-        description: "System notifications and alerts",
-        roles: ["AGENT", "SALES_MANAGER", "HOA", "TRAINER", "ADMIN"]
-      }
-    ]
   }
 ];
 

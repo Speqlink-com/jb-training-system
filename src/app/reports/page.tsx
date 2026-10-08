@@ -1,290 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import { ProtectedRoute } from "@/lib/auth/protected-route";
+import { useEffect, useState } from "react";
+import { CheckCircle2, GraduationCap, Loader2, UserPlus, Users } from "lucide-react";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { NotificationPanel } from "@/components/layout/notification-panel";
-import { ReportFilters } from "@/components/reports/report-filters";
-import { PerformanceOverview } from "@/components/reports/performance-overview";
-import { TrainingAnalytics } from "@/components/reports/training-analytics";
-import { WorkforceMetrics } from "@/components/reports/workforce-metrics";
-import { OnboardingStats } from "@/components/reports/onboarding-stats";
-import { ExportReports } from "@/components/reports/export-reports";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ProtectedRoute } from "@/lib/auth/protected-route";
 import { Permission } from "@/config/permissions";
-import { 
-  BarChart3, 
-  Download, 
-  Filter,
-  TrendingUp,
-  Users,
-  GraduationCap,
-  UserCheck,
-  Calendar,
-  Target,
-  Award,
-  Activity
-} from "lucide-react";
+import { listTrainings, type TrainingProgram } from "@/lib/training-api";
+import { Card, CardContent } from "@/components/ui/card";
 
-// Mock analytics data
-const mockAnalyticsData = {
-  performance: {
-    totalAgents: 1250,
-    activeAgents: 1180,
-    monthlyTarget: 450000000,
-    monthlyAchievement: 428000000,
-    achievementRate: 95,
-    avgTicketSize: 185000,
-    conversionRate: 24,
-    customerSatisfaction: 4.6,
-    trends: {
-      achievement: [92, 88, 95, 91, 89, 94, 95],
-      ticketSize: [175000, 168000, 182000, 179000, 171000, 183000, 185000],
-      conversion: [22, 21, 25, 23, 22, 24, 24]
-    }
-  },
-  training: {
-    totalSessions: 48,
-    completedSessions: 42,
-    totalParticipants: 2850,
-    averageAttendance: 92,
-    averageEffectiveness: 89,
-    complianceRate: 94,
-    categoriesBreakdown: {
-      "AML": 15,
-      "PRODUCT_MIX": 12,
-      "NEW_AGENTS": 8,
-      "SPECIALISED": 6,
-      "EXISTING_TARGETED": 4,
-      "ALTERNATIVE_DISTRIBUTION": 3
-    }
-  },
-  workforce: {
-    totalSalesManagers: 24,
-    totalHOAs: 5,
-    totalTrainers: 8,
-    avgTeamSize: 52,
-    topPerformers: [
-      { name: "Grace Wanjiru", role: "Sales Manager", performance: 113, region: "Central" },
-      { name: "Samuel Mwangi", role: "HOA", performance: 105, region: "Coast" },
-      { name: "David Kimani", role: "Sales Manager", performance: 95, region: "Central" }
-    ]
-  },
-  onboarding: {
-    totalCandidates: 156,
-    activeCandidates: 89,
-    approvedCandidates: 34,
-    onboardedAgents: 23,
-    conversionRate: 67,
-    avgProcessingTime: 12,
-    pipeline: {
-      "APPLICATION_SUBMITTED": 25,
-      "UNDER_REVIEW": 18,
-      "INTERVIEW_SCHEDULED": 21,
-      "OFFER_EXTENDED": 15,
-      "ACTIVE_AGENT": 23
-    }
-  }
-};
+function ReportsWorkspace() {
+  const [trainings, setTrainings] = useState<TrainingProgram[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    const load = async () => {
+      try { setTrainings(await listTrainings()); }
+      catch (caught) { setError(caught instanceof Error ? caught.message : "Reports could not be loaded"); }
+      finally { setLoading(false); }
+    };
+    const timer = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
-function ReportsContent() {
-  const [filters, setFilters] = useState({
-    dateRange: { start: "", end: "" },
-    region: "",
-    branch: "",
-    reportType: "",
-  });
-  const [activeTab, setActiveTab] = useState("overview");
-
-  return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Reports & Analytics</h1>
-          <p className="text-muted-foreground">
-            Comprehensive performance insights and business intelligence
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <Filter className="h-4 w-4 mr-2" />
-            Advanced Filters
-          </Button>
-          <Button>
-            <Download className="h-4 w-4 mr-2" />
-            Export Dashboard
-          </Button>
-        </div>
-      </div>
-
-      {/* Report Filters */}
-      <ReportFilters 
-        filters={filters}
-        onFiltersChange={setFilters}
-      />
-
-      {/* Main Analytics Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Overview
-          </TabsTrigger>
-          <TabsTrigger value="performance" className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Performance
-          </TabsTrigger>
-          <TabsTrigger value="training" className="flex items-center gap-2">
-            <GraduationCap className="h-4 w-4" />
-            Training
-          </TabsTrigger>
-          <TabsTrigger value="workforce" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Workforce
-          </TabsTrigger>
-          <TabsTrigger value="onboarding" className="flex items-center gap-2">
-            <UserCheck className="h-4 w-4" />
-            Onboarding
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <PerformanceOverview data={mockAnalyticsData} />
-        </TabsContent>
-
-        <TabsContent value="performance" className="space-y-6">
-          {/* Performance Analytics */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Achievement Overview
-                </CardTitle>
-                <CardDescription>
-                  Monthly performance vs targets across regions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-4 text-center">
-                    <div>
-                      <div className="text-2xl font-bold text-primary">
-                        {mockAnalyticsData.performance.achievementRate}%
-                      </div>
-                      <div className="text-sm text-muted-foreground">Overall Achievement</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-green-600">
-                        KES {(mockAnalyticsData.performance.monthlyAchievement / 1000000).toFixed(0)}M
-                      </div>
-                      <div className="text-sm text-muted-foreground">Monthly Sales</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-blue-600">
-                        {mockAnalyticsData.performance.conversionRate}%
-                      </div>
-                      <div className="text-sm text-muted-foreground">Conversion Rate</div>
-                    </div>
-                  </div>
-                  
-                  {/* Trend indicators */}
-                  <div className="pt-4 border-t">
-                    <h4 className="font-medium mb-2">7-Day Trends</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Achievement Rate</span>
-                        <div className="flex items-center gap-1 text-green-600">
-                          <TrendingUp className="h-3 w-3" />
-                          <span className="text-sm font-medium">+3%</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Avg Ticket Size</span>
-                        <div className="flex items-center gap-1 text-green-600">
-                          <TrendingUp className="h-3 w-3" />
-                          <span className="text-sm font-medium">+6%</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Customer Satisfaction</span>
-                        <div className="flex items-center gap-1 text-green-600">
-                          <TrendingUp className="h-3 w-3" />
-                          <span className="text-sm font-medium">+0.2</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="h-5 w-5" />
-                  Top Performers
-                </CardTitle>
-                <CardDescription>
-                  Highest achieving teams and individuals
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {mockAnalyticsData.workforce.topPerformers.map((performer, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold">
-                        {index + 1}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{performer.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {performer.role} • {performer.region}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-primary">{performer.performance}%</p>
-                        <p className="text-xs text-muted-foreground">Achievement</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="training" className="space-y-6">
-          <TrainingAnalytics data={mockAnalyticsData.training} />
-        </TabsContent>
-
-        <TabsContent value="workforce" className="space-y-6">
-          <WorkforceMetrics data={mockAnalyticsData.workforce} />
-        </TabsContent>
-
-        <TabsContent value="onboarding" className="space-y-6">
-          <OnboardingStats data={mockAnalyticsData.onboarding} />
-        </TabsContent>
-      </Tabs>
-
-      {/* Export Options */}
-          <ExportReports data={mockAnalyticsData} />
-    </div>
-  );
+  const joins = trainings.reduce((sum, training) => sum + training.registrationCount, 0);
+  const attendance = trainings.reduce((sum, training) => sum + training.attendanceCount, 0);
+  const rate = joins ? Math.round((attendance / joins) * 100) : 0;
+  return <div className="mx-auto max-w-[1440px] space-y-7 px-5 py-7 sm:px-8 lg:px-12 lg:py-10"><header><p className="text-[10px] font-bold uppercase tracking-[0.19em] text-[#9b1b36]">Live reporting</p><h1 className="mt-2 text-4xl font-bold tracking-[-0.045em] text-[#171d25]">Training reports</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">These figures are calculated from PostgreSQL programmes and verified QR attendance—no sample analytics.</p></header>{error && <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</p>}{loading ? <div className="grid min-h-56 place-items-center rounded-xl border border-slate-200 bg-white"><Loader2 className="h-5 w-5 animate-spin text-slate-500" /></div> : <><section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Summary icon={GraduationCap} label="Programmes" value={trainings.length} /><Summary icon={UserPlus} label="Programme joins" value={joins} /><Summary icon={CheckCircle2} label="Verified attendance" value={attendance} /><Summary icon={Users} label="Attendance rate" value={`${rate}%`} /></section><section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"><div className="border-b border-slate-200 bg-white p-5"><h2 className="font-semibold text-slate-900">Programme performance</h2></div><div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-500"><tr><th className="px-5 py-3">Programme</th><th className="px-5 py-3">Trainer</th><th className="px-5 py-3">Scheduled</th><th className="px-5 py-3">Joined</th><th className="px-5 py-3">Present</th></tr></thead><tbody className="divide-y divide-slate-100 bg-white">{trainings.map((training) => <tr key={training.id}><td className="px-5 py-4 font-semibold text-slate-900">{training.title}</td><td className="px-5 py-4 text-slate-600">{training.trainerName}</td><td className="px-5 py-4 text-slate-600">{new Date(training.scheduledAt).toLocaleDateString("en-KE")}</td><td className="px-5 py-4">{training.registrationCount}</td><td className="px-5 py-4">{training.attendanceCount}</td></tr>)}{trainings.length === 0 && <tr><td colSpan={5} className="px-5 py-16 text-center text-slate-500">No programme data has been recorded.</td></tr>}</tbody></table></div></section></>}</div>;
 }
 
-export default function ReportsPage() {
-  return (
-    <ProtectedRoute 
-      requiredPermissions={[Permission.REPORTS_READ]}
-    >
-      <DashboardShell>
-        <ReportsContent />
-        <NotificationPanel />
-      </DashboardShell>
-    </ProtectedRoute>
-  );
-}
+function Summary({ icon: Icon, label, value }: { icon: typeof Users; label: string; value: string | number }) { return <Card className="bg-white"><CardContent className="p-5"><Icon className="h-5 w-5 text-[#9b1b36]" /><p className="mt-4 text-3xl font-bold text-slate-900">{value}</p><p className="mt-1 text-sm text-slate-500">{label}</p></CardContent></Card>; }
+
+export default function ReportsPage() { return <ProtectedRoute requiredPermissions={[Permission.REPORTS_READ]}><DashboardShell><ReportsWorkspace /><NotificationPanel /></DashboardShell></ProtectedRoute>; }

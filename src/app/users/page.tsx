@@ -6,6 +6,6 @@ import { UserDirectory } from "@/components/workforce/user-directory";
 import { ProtectedRoute } from "@/lib/auth/protected-route";
 import { Role } from "@/config/permissions";
 
-export default function HoasPage() {
-  return <ProtectedRoute requiredRoles={[Role.ADMIN]}><DashboardShell><UserDirectory role="HOA" eyebrow="Administration · Leadership" title="Heads of agency" description="Manage real head-of-agency accounts and their access status." /><NotificationPanel /></DashboardShell></ProtectedRoute>;
+export default function UsersPage() {
+  return <ProtectedRoute requiredRoles={[Role.ADMIN]}><DashboardShell><UserDirectory eyebrow="Administration · Access control" title="All users" description="Create and manage every real platform account from one directory." /><NotificationPanel /></DashboardShell></ProtectedRoute>;
 }

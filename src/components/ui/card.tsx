@@ -11,7 +11,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       ref={ref}
       className={cn(
         "rounded-xl border transition-all duration-200",
-        variant === "default" && "bg-card text-card-foreground border-border shadow-md hover:shadow-lg",
+        variant === "default" && "border-slate-200 bg-white text-slate-900 shadow-md hover:shadow-lg",
         variant === "elevated" && "admin-card",
         variant === "primary" && "card-primary",
         variant === "success" && "card-success",

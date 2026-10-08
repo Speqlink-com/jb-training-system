@@ -15,46 +15,6 @@ import {
   Info
 } from "lucide-react";
 
-// Mock notifications - replace with real data from API
-const mockNotifications = [
-  {
-    id: "1",
-    title: "Training Reminder",
-    message: "AML Compliance Training starts in 30 minutes",
-    type: "reminder",
-    time: "2 minutes ago",
-    read: false,
-    icon: GraduationCap,
-  },
-  {
-    id: "2", 
-    title: "New Agent Onboarded",
-    message: "John Kamau (AGT-001234) has completed onboarding",
-    type: "success",
-    time: "1 hour ago",
-    read: false,
-    icon: Users,
-  },
-  {
-    id: "3",
-    title: "Training Compliance Alert",
-    message: "3 agents are overdue on mandatory training",
-    type: "warning",
-    time: "2 hours ago",
-    read: true,
-    icon: AlertTriangle,
-  },
-  {
-    id: "4",
-    title: "System Update",
-    message: "Platform maintenance scheduled for tonight at 2 AM",
-    type: "info",
-    time: "1 day ago",
-    read: true,
-    icon: Info,
-  },
-];
-
 export function NotificationPanel() {
   const { 
     notificationPanelOpen, 
@@ -64,8 +24,7 @@ export function NotificationPanel() {
     notifications,
   } = useNotificationStore();
 
-  const visibleNotifications = [
-    ...notifications.map((notification) => ({
+  const visibleNotifications = notifications.map((notification) => ({
       ...notification,
       time: new Date(notification.timestamp).toLocaleString(),
       read: notification.read ?? false,
@@ -77,9 +36,7 @@ export function NotificationPanel() {
             : notification.type === "reminder"
               ? GraduationCap
               : Info,
-    })),
-    ...mockNotifications,
-  ];
+    }));
 
   const markAllAsRead = () => {
     setUnreadCount(0);

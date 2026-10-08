@@ -21,7 +21,7 @@ interface NotificationStore extends NotificationState {
 }
 
 export const useNotificationStore = create<NotificationStore>((set) => ({
-  unreadCount: 3, // Set initial unread count for demo
+  unreadCount: 0,
   notificationPanelOpen: false,
   notifications: [],
 

@@ -41,8 +41,8 @@ export default function SetupPage() {
       setError("Email is required");
       return false;
     }
-    if (!formData.password || formData.password.length < 8) {
-      setError("Password must be at least 8 characters long");
+    if (!formData.password || formData.password.length < 10) {
+      setError("Password must be at least 10 characters long");
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -151,7 +151,7 @@ export default function SetupPage() {
                 <Input
                   id="firstName"
                   name="firstName"
-                  placeholder="John"
+                  placeholder="First name"
                   value={formData.firstName}
                   onChange={handleInputChange}
                   disabled={isLoading}
@@ -163,7 +163,7 @@ export default function SetupPage() {
                 <Input
                   id="lastName"
                   name="lastName"
-                  placeholder="Doe"
+                  placeholder="Last name"
                   value={formData.lastName}
                   onChange={handleInputChange}
                   disabled={isLoading}
@@ -178,7 +178,7 @@ export default function SetupPage() {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="admin@example.com"
+                  placeholder="administrator email"
                 value={formData.email}
                 onChange={handleInputChange}
                 disabled={isLoading}
@@ -205,12 +205,12 @@ export default function SetupPage() {
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Enter a strong password (min. 8 characters)"
+                placeholder="Enter a strong password (min. 10 characters)"
                 value={formData.password}
                 onChange={handleInputChange}
                 disabled={isLoading}
                 required
-                minLength={8}
+                minLength={10}
               />
             </div>
 
