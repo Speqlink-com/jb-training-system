@@ -7,5 +7,5 @@ import { ProtectedRoute } from "@/lib/auth/protected-route";
 import { Role } from "@/config/permissions";
 
 export default function SalesManagersPage() {
-  return <ProtectedRoute requiredRoles={[Role.ADMIN]}><DashboardShell><UserDirectory role="SALES_MANAGER" eyebrow="Administration · Leadership" title="Sales managers" description="Manage real sales-manager accounts, assignments, invitations, and access." /><NotificationPanel /></DashboardShell></ProtectedRoute>;
+  return <ProtectedRoute requiredRoles={[Role.ADMIN]}><DashboardShell><UserDirectory role="SALES_MANAGER" eyebrow="Administration" title="Sales managers" /><NotificationPanel /></DashboardShell></ProtectedRoute>;
 }

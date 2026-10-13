@@ -4,17 +4,15 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { useUIStore } from "@/stores/ui.store";
 import { useNotificationStore } from "@/stores/notification.store";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, LogOut, Menu, Search, Settings, User } from "lucide-react";
+import { Bell, LogOut, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HeaderProps {
@@ -52,14 +50,6 @@ export function Header({ className }: HeaderProps) {
           <Menu className="h-5 w-5" />
         </Button>
 
-        <div className="relative hidden w-72 lg:block">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <Input
-            type="search"
-            placeholder="Search the workspace"
-            className="h-9 rounded-lg border-[#dce1e3] bg-[#f8f9fa] pl-9 text-sm shadow-none focus:bg-white"
-          />
-        </div>
       </div>
 
       <div className="flex items-center gap-2">
@@ -97,16 +87,9 @@ export function Header({ className }: HeaderProps) {
               <p className="mt-1 truncate text-xs text-slate-500">{user.email}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="rounded-lg">
-              <User className="mr-2 h-4 w-4" /> Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-lg">
-              <Settings className="mr-2 h-4 w-4" /> Settings
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => void logout()} className="rounded-lg text-[#9b1b36] focus:text-[#9b1b36]">
+            <button type="button" onClick={() => void logout()} className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-[#9b1b36] hover:bg-slate-100">
               <LogOut className="mr-2 h-4 w-4" /> Sign out
-            </DropdownMenuItem>
+            </button>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

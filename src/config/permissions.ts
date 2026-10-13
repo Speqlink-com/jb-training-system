@@ -3,6 +3,7 @@ export enum Role {
   SALES_MANAGER = "SALES_MANAGER", 
   HOA = "HOA",
   TRAINER = "TRAINER",
+  SUPER_TRAINER = "SUPER_TRAINER",
   ADMIN = "ADMIN"
 }
 
@@ -81,6 +82,17 @@ export const rolePermissions: Record<Role, Permission[]> = {
     Permission.TRAININGS_READ,
     Permission.TRAININGS_CREATE,
     Permission.TRAININGS_UPDATE,
+    Permission.ATTENDANCE_READ,
+    Permission.ATTENDANCE_MANAGE,
+    Permission.REPORTS_READ,
+    Permission.REPORTS_EXPORT
+  ],
+  [Role.SUPER_TRAINER]: [
+    Permission.AGENTS_READ,
+    Permission.TRAININGS_READ,
+    Permission.TRAININGS_CREATE,
+    Permission.TRAININGS_UPDATE,
+    Permission.TRAININGS_DELETE,
     Permission.ATTENDANCE_READ,
     Permission.ATTENDANCE_MANAGE,
     Permission.REPORTS_READ,

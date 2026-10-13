@@ -42,7 +42,6 @@ export function Sidebar({ className }: SidebarProps) {
           </span>
           <span className="min-w-0">
             <span className="block truncate text-sm font-semibold tracking-tight">Jubilee Learning</span>
-            <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">Operations hub</span>
           </span>
         </Link>
       </div>

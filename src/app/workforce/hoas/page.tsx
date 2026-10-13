@@ -7,5 +7,5 @@ import { ProtectedRoute } from "@/lib/auth/protected-route";
 import { Role } from "@/config/permissions";
 
 export default function HoasPage() {
-  return <ProtectedRoute requiredRoles={[Role.ADMIN]}><DashboardShell><UserDirectory role="HOA" eyebrow="Administration · Leadership" title="Heads of agency" description="Manage real head-of-agency accounts and their access status." /><NotificationPanel /></DashboardShell></ProtectedRoute>;
+  return <ProtectedRoute requiredRoles={[Role.ADMIN]}><DashboardShell><UserDirectory role="HOA" eyebrow="Administration" title="Heads of agency" /><NotificationPanel /></DashboardShell></ProtectedRoute>;
 }

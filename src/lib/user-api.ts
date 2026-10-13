@@ -1,9 +1,10 @@
 import { apiClient } from "@/lib/api/client";
 
-export type UserRoleValue = "ADMIN" | "TRAINER" | "SALES_MANAGER" | "HOA" | "AGENT";
+export type UserRoleValue = "ADMIN" | "SUPER_TRAINER" | "TRAINER" | "SALES_MANAGER" | "HOA" | "AGENT";
 
 export const USER_ROLE_LABELS: Record<UserRoleValue, string> = {
   ADMIN: "Administrator",
+  SUPER_TRAINER: "Super trainer",
   TRAINER: "Trainer",
   SALES_MANAGER: "Sales manager",
   HOA: "Head of agency",

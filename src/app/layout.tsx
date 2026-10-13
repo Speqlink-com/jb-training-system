@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Jubilee Learning Hub",
-  description: "Training, performance, and compliance operations workspace",
+  description: "Jubilee Learning Hub",
   icons: {
     icon: "/jubilee-logo.png",
     shortcut: "/jubilee-logo.png",
