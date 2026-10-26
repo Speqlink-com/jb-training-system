@@ -54,7 +54,7 @@ export async function exportExcelWorkbook({ fileName, sheets }: ExcelExportOptio
 
   const { Workbook } = await import("exceljs");
   const workbook = new Workbook();
-  workbook.creator = "Jubilee Learning Hub";
+  workbook.creator = "The Alpha Academy";
   workbook.created = new Date();
   workbook.modified = new Date();
   workbook.calcProperties.fullCalcOnLoad = true;
@@ -86,7 +86,7 @@ export async function exportExcelWorkbook({ fileName, sheets }: ExcelExportOptio
     worksheet.mergeCells(1, 1, 1, lastColumn);
     worksheet.getCell(1, 1).value = sheetDefinition.title;
     worksheet.getCell(1, 1).font = { bold: true, color: { argb: "FFFFFFFF" }, size: 16 };
-    worksheet.getCell(1, 1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF8F1933" } };
+    worksheet.getCell(1, 1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFA90024" } };
     worksheet.getCell(1, 1).alignment = { vertical: "middle", horizontal: "left" };
     worksheet.getRow(1).height = 28;
 

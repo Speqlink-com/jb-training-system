@@ -77,22 +77,22 @@ export function PlatformLoginScreen() {
 
   return (
     <main className="grid min-h-dvh bg-white lg:grid-cols-[minmax(390px,0.86fr)_minmax(520px,1.14fr)]">
-      <section className="relative isolate flex min-h-[300px] overflow-hidden bg-[#ead9dd] px-7 py-8 sm:min-h-[360px] sm:px-12 sm:py-11 lg:min-h-dvh lg:px-[clamp(3rem,6vw,8rem)] lg:py-[clamp(3rem,7vh,6rem)]">
-        <div className="absolute inset-0 -z-20 bg-[linear-gradient(145deg,#f7eef0_0%,#e4cfd4_46%,#c9abb3_100%)]" />
-        <div className="absolute -left-24 bottom-[-12rem] -z-10 h-[34rem] w-[34rem] rounded-full bg-[#9b1b36]/10 blur-3xl" />
+      <section className="relative isolate flex min-h-[300px] overflow-hidden bg-[#f5dde2] px-7 py-8 sm:min-h-[360px] sm:px-12 sm:py-11 lg:min-h-dvh lg:px-[clamp(3rem,6vw,8rem)] lg:py-[clamp(3rem,7vh,6rem)]">
+        <div className="absolute inset-0 -z-20 bg-[linear-gradient(145deg,#fff7f8_0%,#f5dde2_46%,#e6b9c2_100%)]" />
+        <div className="absolute -left-24 bottom-[-12rem] -z-10 h-[34rem] w-[34rem] rounded-full bg-[#a90024]/12 blur-3xl" />
         <div className="absolute right-[-10rem] top-[-12rem] -z-10 h-[30rem] w-[30rem] rounded-full bg-white/45 blur-3xl" />
 
         <div className="flex w-full max-w-[660px] flex-col">
           <div className="flex items-center">
             <div className="grid h-[68px] w-[132px] shrink-0 place-items-center rounded-[18px] bg-white px-3 shadow-[0_14px_28px_rgba(74,28,39,0.14),0_2px_5px_rgba(15,23,42,0.08)] sm:h-[78px] sm:w-[154px]">
-              <Image src="/jubilee-logo.png" alt="Jubilee Insurance" width={132} height={132} className="h-auto w-full" priority />
+              <Image src="/jubilee-group-logo.png" alt="Jubilee Group" width={132} height={64} className="h-auto w-full" priority />
             </div>
           </div>
 
           <div className="mt-12 sm:mt-16 lg:my-auto lg:mt-20">
             <h1 className="max-w-[620px] text-[clamp(3.25rem,7vw,7rem)] font-bold leading-[0.9] tracking-[-0.065em] text-[#171d25]">
-              Jubilee
-              <span className="block">Learning Hub</span>
+              The Alpha
+              <span className="block">Academy</span>
             </h1>
           </div>
         </div>
@@ -126,7 +126,7 @@ export function PlatformLoginScreen() {
                 onChange={(event) => setEmail(event.target.value)}
                 disabled={isBusy}
                 required
-                className="h-14 w-full rounded-lg border border-slate-300 bg-white px-4 text-base text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.03)] outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-[#9b1b36] focus:ring-4 focus:ring-[#9b1b36]/10 disabled:cursor-wait disabled:bg-slate-50 sm:h-[58px]"
+                className="h-14 w-full rounded-lg border border-slate-300 bg-white px-4 text-base text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.03)] outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-[#a90024] focus:ring-4 focus:ring-[#a90024]/10 disabled:cursor-wait disabled:bg-slate-50 sm:h-[58px]"
                 placeholder="name@jubilee.co.ke"
               />
             </div>}
@@ -146,7 +146,7 @@ export function PlatformLoginScreen() {
                   disabled={isBusy}
                   minLength={passwordChangeRequired ? 10 : undefined}
                   required
-                  className="h-14 w-full rounded-lg border border-slate-300 bg-white px-4 pr-14 text-base text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.03)] outline-none transition hover:border-slate-400 focus:border-[#9b1b36] focus:ring-4 focus:ring-[#9b1b36]/10 disabled:cursor-wait disabled:bg-slate-50 sm:h-[58px]"
+                  className="h-14 w-full rounded-lg border border-slate-300 bg-white px-4 pr-14 text-base text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.03)] outline-none transition hover:border-slate-400 focus:border-[#a90024] focus:ring-4 focus:ring-[#a90024]/10 disabled:cursor-wait disabled:bg-slate-50 sm:h-[58px]"
                 />
                 <button
                   type="button"
@@ -154,7 +154,7 @@ export function PlatformLoginScreen() {
                   aria-pressed={showPassword}
                   onClick={() => setShowPassword((visible) => !visible)}
                   disabled={isBusy}
-                  className="absolute inset-y-0 right-0 grid w-14 place-items-center text-slate-500 transition hover:text-[#9b1b36] disabled:cursor-wait disabled:opacity-50"
+                  className="absolute inset-y-0 right-0 grid w-14 place-items-center text-slate-500 transition hover:text-[#a90024] disabled:cursor-wait disabled:opacity-50"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -163,14 +163,14 @@ export function PlatformLoginScreen() {
 
             {passwordChangeRequired && <div className="space-y-2.5">
               <label htmlFor="confirmPassword" className="text-sm font-semibold text-slate-700">Confirm new password</label>
-              <input id="confirmPassword" name="confirmPassword" type={showPassword ? "text" : "password"} autoComplete="new-password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} disabled={isBusy} minLength={10} required className="h-14 w-full rounded-lg border border-slate-300 bg-white px-4 text-base text-slate-900 outline-none transition focus:border-[#9b1b36] focus:ring-4 focus:ring-[#9b1b36]/10 disabled:bg-slate-50 sm:h-[58px]" />
+              <input id="confirmPassword" name="confirmPassword" type={showPassword ? "text" : "password"} autoComplete="new-password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} disabled={isBusy} minLength={10} required className="h-14 w-full rounded-lg border border-slate-300 bg-white px-4 text-base text-slate-900 outline-none transition focus:border-[#a90024] focus:ring-4 focus:ring-[#a90024]/10 disabled:bg-slate-50 sm:h-[58px]" />
               <p className="text-xs text-slate-500">Minimum 10 characters</p>
             </div>}
 
             <button
               type="submit"
               disabled={isBusy}
-              className="flex h-14 w-full items-center justify-center rounded-lg bg-[#9b1b36] px-5 text-base font-semibold text-white shadow-[0_8px_20px_rgba(155,27,54,0.18)] transition hover:bg-[#86172f] hover:shadow-[0_12px_24px_rgba(155,27,54,0.24)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#9b1b36]/20 disabled:cursor-wait disabled:opacity-70 sm:h-[58px]"
+              className="flex h-14 w-full items-center justify-center rounded-lg bg-[#a90024] px-5 text-base font-semibold text-white shadow-[0_8px_20px_rgba(169,0,36,0.20)] transition hover:bg-[#85001c] hover:shadow-[0_12px_24px_rgba(169,0,36,0.28)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#a90024]/20 disabled:cursor-wait disabled:opacity-70 sm:h-[58px]"
             >
               {isBusy ? (
                 <span className="flex items-center gap-2">

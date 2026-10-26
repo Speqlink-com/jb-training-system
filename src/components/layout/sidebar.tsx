@@ -34,14 +34,14 @@ export function Sidebar({ className }: SidebarProps) {
   };
 
   return (
-    <div className={cn("flex h-full w-64 flex-col bg-[#641329] text-white", className)}>
+    <div className={cn("flex h-full w-64 flex-col bg-[linear-gradient(180deg,#a90024_0%,#780019_100%)] text-white", className)}>
       <div className="flex h-[4.5rem] items-center border-b border-white/10 px-5">
         <Link href="/dashboard" className="flex min-w-0 items-center gap-3">
           <span className="grid h-10 w-16 shrink-0 place-items-center rounded-lg bg-white px-1.5 shadow-sm">
-            <Image src="/jubilee-logo.png" alt="Jubilee Insurance" width={64} height={64} className="h-auto w-full" />
+            <Image src="/jubilee-group-logo.png" alt="Jubilee Group" width={82} height={40} className="h-auto w-full" />
           </span>
           <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold tracking-tight">Jubilee Learning</span>
+            <span className="block truncate text-sm font-semibold tracking-tight">The Alpha Academy</span>
           </span>
         </Link>
       </div>
@@ -78,7 +78,7 @@ export function Sidebar({ className }: SidebarProps) {
                       className={cn(
                         "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                         isActiveLink(item.href)
-                          ? "bg-[#f7ecef] text-[#641329] shadow-sm"
+                          ? "bg-[#fbeaec] text-[#780019] shadow-sm"
                           : "text-white/68 hover:bg-white/10 hover:text-white",
                       )}
                     >
@@ -115,7 +115,7 @@ export function Sidebar({ className }: SidebarProps) {
 
       <div className="border-t border-white/10 p-4">
         <div className="mb-3 flex items-center gap-3 px-1">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#f7ecef] text-xs font-bold text-[#641329]">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#fbeaec] text-xs font-bold text-[#780019]">
             {user.firstName.charAt(0)}{user.lastName.charAt(0)}
           </span>
           <div className="min-w-0 flex-1">

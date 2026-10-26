@@ -383,7 +383,7 @@ export async function downloadAttendanceExport(filters: { trainingId?: string; s
   const response = await apiClient.download(`/api/trainings/attendance/export.xlsx${attendanceQuery(filters)}`);
   const blob = await response.blob();
   const disposition = response.headers.get("Content-Disposition") || "";
-  const filename = disposition.match(/filename="?([^";]+)"?/i)?.[1] || "jubilee-training-attendance.xlsx";
+  const filename = disposition.match(/filename="?([^";]+)"?/i)?.[1] || "alpha-academy-training-attendance.xlsx";
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;

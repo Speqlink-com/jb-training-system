@@ -60,7 +60,7 @@ function AttendanceWorkspace() {
   };
 
   return <div className="mx-auto max-w-[1440px] space-y-7 px-5 py-7 sm:px-8 lg:px-12 lg:py-10">
-    <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.19em] text-[#9b1b36]">Training</p><h1 className="mt-2 text-4xl font-bold tracking-[-0.045em] text-[#171d25]">Attendance register</h1></div><Button onClick={() => void download()} disabled={exporting} className="bg-[#9b1b36] hover:bg-[#7b172e]">{exporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}Export Excel</Button></header>
+    <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.19em] text-[#a90024]">Training</p><h1 className="mt-2 text-4xl font-bold tracking-[-0.045em] text-[#171d25]">Attendance register</h1></div><Button onClick={() => void download()} disabled={exporting} className="bg-[#a90024] hover:bg-[#85001c]">{exporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}Export Excel</Button></header>
 
     {error && <div className="flex items-center justify-between gap-4 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700"><span>{error}</span><Button variant="outline" size="sm" onClick={() => void refresh()}>Try again</Button></div>}
 
@@ -77,6 +77,6 @@ function AttendanceWorkspace() {
   </div>;
 }
 
-function SummaryCard({ icon: Icon, label, value }: { icon: typeof Users; label: string; value: number }) { return <div className="rounded-xl border border-[#dce1e3] bg-white p-5"><Icon className="h-5 w-5 text-[#9b1b36]" /><p className="mt-4 text-3xl font-bold text-slate-900">{value}</p><p className="mt-1 text-sm font-medium text-slate-600">{label}</p></div>; }
+function SummaryCard({ icon: Icon, label, value }: { icon: typeof Users; label: string; value: number }) { return <div className="rounded-xl border border-[#dce1e3] bg-white p-5"><Icon className="h-5 w-5 text-[#a90024]" /><p className="mt-4 text-3xl font-bold text-slate-900">{value}</p><p className="mt-1 text-sm font-medium text-slate-600">{label}</p></div>; }
 
 export default function AttendancePage() { return <ProtectedRoute requiredRoles={[Role.ADMIN, Role.SUPER_TRAINER, Role.TRAINER]}><DashboardShell><AttendanceWorkspace /><NotificationPanel /></DashboardShell></ProtectedRoute>; }

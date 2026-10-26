@@ -24,7 +24,7 @@ export function StatCard({
           </p>
           {Icon && (
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#f6e8eb]">
-              <Icon className="h-4 w-4 text-[#9b1b36]" />
+              <Icon className="h-4 w-4 text-[#a90024]" />
             </div>
           )}
         </div>

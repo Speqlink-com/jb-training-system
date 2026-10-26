@@ -29,14 +29,14 @@ export function MobileNavigation({ isOpen }: MobileNavigationProps) {
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-50 flex w-[min(18rem,86vw)] flex-col bg-[#641329] text-white shadow-2xl transition-transform duration-300 md:hidden",
+        "fixed inset-y-0 left-0 z-50 flex w-[min(18rem,86vw)] flex-col bg-[linear-gradient(180deg,#a90024_0%,#780019_100%)] text-white shadow-2xl transition-transform duration-300 md:hidden",
         isOpen ? "translate-x-0" : "-translate-x-full",
       )}
     >
       <div className="flex h-[4.5rem] items-center justify-between border-b border-white/10 px-5">
         <Link href="/dashboard" className="flex items-center gap-3" onClick={closeMenu}>
-          <span className="grid h-10 w-16 place-items-center rounded-lg bg-white px-1.5"><Image src="/jubilee-logo.png" alt="Jubilee Insurance" width={64} height={64} className="h-auto w-full" /></span>
-          <span className="text-sm font-semibold">Jubilee Learning</span>
+          <span className="grid h-10 w-16 place-items-center rounded-lg bg-white px-1.5"><Image src="/jubilee-group-logo.png" alt="Jubilee Group" width={82} height={40} className="h-auto w-full" /></span>
+          <span className="text-sm font-semibold">The Alpha Academy</span>
         </Link>
         <button type="button" onClick={closeMenu} className="grid h-9 w-9 place-items-center rounded-lg text-white/70 hover:bg-white/10 hover:text-white" aria-label="Close navigation">
           <X className="h-5 w-5" />
@@ -57,7 +57,7 @@ export function MobileNavigation({ isOpen }: MobileNavigationProps) {
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                       isActiveLink(item.href)
-                        ? "bg-[#f7ecef] text-[#641329]"
+                        ? "bg-[#fbeaec] text-[#780019]"
                         : "text-white/68 hover:bg-white/10 hover:text-white",
                     )}
                   >
@@ -73,7 +73,7 @@ export function MobileNavigation({ isOpen }: MobileNavigationProps) {
 
       <div className="border-t border-white/10 p-4">
         <div className="mb-3 flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-[#f7ecef] text-xs font-bold text-[#641329]">
+          <span className="grid h-10 w-10 place-items-center rounded-full bg-[#fbeaec] text-xs font-bold text-[#780019]">
             {user.firstName.charAt(0)}{user.lastName.charAt(0)}
           </span>
           <div className="min-w-0">

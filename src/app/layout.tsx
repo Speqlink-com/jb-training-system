@@ -3,12 +3,12 @@ import { AuthProvider } from "@/lib/auth/auth-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Jubilee Learning Hub",
-  description: "Jubilee Learning Hub",
+  title: "The Alpha Academy",
+  description: "The Alpha Academy",
   icons: {
-    icon: "/jubilee-logo.png",
-    shortcut: "/jubilee-logo.png",
-    apple: "/jubilee-logo.png",
+    icon: "/jubilee-group-logo.png",
+    shortcut: "/jubilee-group-logo.png",
+    apple: "/jubilee-group-logo.png",
   },
 };
 

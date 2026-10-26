@@ -53,7 +53,7 @@ export function Header({ className }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="hidden rounded-full bg-[#f7ecef] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#7b172e] sm:block">
+        <span className="hidden rounded-full bg-[#fbeaec] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#85001c] sm:block">
           {user.role.replaceAll("_", " ")}
         </span>
         <Button
@@ -65,7 +65,7 @@ export function Header({ className }: HeaderProps) {
         >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#9b1b36] px-1 text-[9px] font-bold text-white ring-2 ring-white">
+            <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#a90024] px-1 text-[9px] font-bold text-white ring-2 ring-white">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
@@ -75,7 +75,7 @@ export function Header({ className }: HeaderProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-10 rounded-full p-0.5 hover:bg-slate-100" aria-label="Open account menu">
               <Avatar className="h-9 w-9">
-                <AvatarFallback className="bg-[#641329] text-xs font-semibold text-white">
+                <AvatarFallback className="bg-[#780019] text-xs font-semibold text-white">
                   {userInitials}
                 </AvatarFallback>
               </Avatar>
@@ -87,7 +87,7 @@ export function Header({ className }: HeaderProps) {
               <p className="mt-1 truncate text-xs text-slate-500">{user.email}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <button type="button" onClick={() => void logout()} className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-[#9b1b36] hover:bg-slate-100">
+            <button type="button" onClick={() => void logout()} className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-[#a90024] hover:bg-slate-100">
               <LogOut className="mr-2 h-4 w-4" /> Sign out
             </button>
           </DropdownMenuContent>
