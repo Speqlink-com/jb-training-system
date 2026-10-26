@@ -20,7 +20,7 @@ export function DashboardShell({ children, className }: DashboardShellProps) {
       <aside
         className={cn(
           "hidden shrink-0 flex-col transition-all duration-300 ease-in-out md:flex",
-          sidebarOpen ? "w-64" : "w-0 overflow-hidden"
+          sidebarOpen ? "w-[17rem]" : "w-0 overflow-hidden"
         )}
       >
         <Sidebar />
@@ -42,7 +42,7 @@ export function DashboardShell({ children, className }: DashboardShellProps) {
       {/* Mobile Sidebar Overlay */}
       {mobileSidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          className="fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-[1px] md:hidden"
           onClick={() => useUIStore.getState().setMobileSidebarOpen(false)}
         />
       )}
